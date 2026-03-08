@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, Moon, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { clearSessionUser, getSessionUser } from '@/lib/api';
 import { LoginModal } from './login-modal';
@@ -18,6 +18,7 @@ export function Navbar() {
   const [openLogin, setOpenLogin] = useState(false);
   const [openSignup, setOpenSignup] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dark, setDark] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -29,6 +30,11 @@ export function Navbar() {
       else setUser(null);
     };
 
+    const storedTheme = localStorage.getItem('kx_theme') || 'light';
+    const isDark = storedTheme === 'dark';
+    setDark(isDark);
+    document.documentElement.classList.toggle('dark', isDark);
+
     sync();
     window.addEventListener('session-changed', sync);
     window.addEventListener('storage', sync);
@@ -37,6 +43,13 @@ export function Navbar() {
       window.removeEventListener('storage', sync);
     };
   }, [openLogin, openSignup]);
+
+  function toggleTheme() {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('kx_theme', next ? 'dark' : 'light');
+  }
 
   function logout() {
     clearSessionUser();
@@ -63,6 +76,7 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <button onClick={toggleTheme} className="rounded-xl border p-2" aria-label="Toggle theme">{dark ? <Sun size={16} /> : <Moon size={16} />}</button>
           {user ? (
             <>
               <span className="text-xs">Hi, {user.name} ({user.role})</span>
@@ -76,11 +90,7 @@ export function Navbar() {
           )}
         </div>
 
-        <button
-          className="inline-flex rounded-xl border p-2 md:hidden"
-          onClick={() => setMobileOpen((s) => !s)}
-          aria-label="Toggle menu"
-        >
+        <button className="inline-flex rounded-xl border p-2 md:hidden" onClick={() => setMobileOpen((s) => !s)} aria-label="Toggle menu">
           {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
@@ -88,13 +98,15 @@ export function Navbar() {
       {mobileOpen ? (
         <div className="mt-3 space-y-2 rounded-xl border p-3 md:hidden">
           {links.map((link) => (
-            <Link key={link.label} href={link.href} className="block rounded-lg px-2 py-2 text-sm hover:bg-slate-100" onClick={() => setMobileOpen(false)}>
+            <Link key={link.label} href={link.href} className="block rounded-lg px-2 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => setMobileOpen(false)}>
               {link.label}
             </Link>
           ))}
-          <Link href="/admin-login" className="block rounded-lg px-2 py-2 text-sm hover:bg-slate-100" onClick={() => setMobileOpen(false)}>
+          <Link href="/admin-login" className="block rounded-lg px-2 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => setMobileOpen(false)}>
             Admin Login
           </Link>
+
+          <button onClick={toggleTheme} className="w-full rounded-lg border px-3 py-2 text-sm">{dark ? 'Light mode' : 'Dark mode'}</button>
 
           {user ? (
             <div className="space-y-2 border-t pt-2">

@@ -7,7 +7,10 @@ const productSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     type: { type: String, enum: ['course', 'ebook', 'test'], required: true },
     thumbnail: String,
-    telegramLink: { type: String, required: true }
+    telegramLink: { type: String, required: true },
+    previewVideoUrl: { type: String, default: '' },
+    studentsCount: { type: Number, default: 0 },
+    rating: { type: Number, default: 4.8 }
   },
   { timestamps: true }
 );
