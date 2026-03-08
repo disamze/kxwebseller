@@ -97,6 +97,8 @@ export default function DashboardPage() {
     setStatus('Profile updated successfully.');
   }
 
+  const pendingOrders = useMemo(() => orders.filter((o) => o.status === 'Pending').length, [orders]);
+
   if (!allowed) {
     return (
       <main className="mx-auto max-w-2xl px-6 py-16">
@@ -112,7 +114,6 @@ export default function DashboardPage() {
   const tests = materials.filter((m) => m.type === 'test');
 
   const list = activeTab === 'courses' ? courses : activeTab === 'ebooks' ? ebooks : activeTab === 'tests' ? tests : materials;
-  const pendingOrders = useMemo(() => orders.filter((o) => o.status === 'Pending').length, [orders]);
 
   return (
     <main className="grid min-h-[80vh] grid-cols-1 md:grid-cols-[260px_1fr]">
