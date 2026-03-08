@@ -12,7 +12,7 @@ export function Navbar() {
   return (
     <header className="sticky top-4 z-40 mx-auto w-[95%] max-w-6xl rounded-2xl glass px-4 py-3 shadow-xl">
       <div className="flex items-center justify-between">
-        <Link href="/" className="font-heading text-xl font-bold text-primary">EduMarket Neo</Link>
+        <Link href="/" className="font-heading text-xl font-bold text-primary">KXMATERIALS</Link>
         <nav className="hidden gap-6 md:flex">
           {links.map((link) => (
             <Link key={link} href="/explore" className="text-sm font-medium hover:text-primary">{link}</Link>

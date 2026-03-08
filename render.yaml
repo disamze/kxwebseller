@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: edumarket-neo-api
+    name: kxmaterials-api
     env: node
     rootDir: server
     plan: free
@@ -16,7 +16,7 @@ services:
         sync: false
 
   - type: web
-    name: edumarket-neo-client
+    name: kxmaterials-client
     env: node
     rootDir: client
     plan: free

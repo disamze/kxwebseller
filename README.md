@@ -1,4 +1,4 @@
-# EduMarket Neo
+# KXMATERIALS
 
 Modern full-stack digital learning marketplace that delivers purchased materials through private Telegram channel links after admin payment verification.
 
@@ -52,8 +52,8 @@ Backend: `http://localhost:5000`
 
 ## Render deployment
 Use `render.yaml` (Blueprint) to create two services:
-1. `edumarket-neo-api` from `server/`
-2. `edumarket-neo-client` from `client/`
+1. `kxmaterials-api` from `server/`
+2. `kxmaterials-client` from `client/`
 
 After deploy:
 - Set frontend `NEXT_PUBLIC_API_URL` to your backend URL + `/api`
