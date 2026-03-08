@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { clearSessionUser, getSessionUser } from '@/lib/api';
@@ -18,17 +19,33 @@ export function Navbar() {
   const [openSignup, setOpenSignup] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const session = getSessionUser();
-    if (session) setUser({ name: session.name, role: session.role });
-    else setUser(null);
+    const sync = () => {
+      const session = getSessionUser();
+      if (session) setUser({ name: session.name, role: session.role });
+      else setUser(null);
+    };
+
+    sync();
+    window.addEventListener('session-changed', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('session-changed', sync);
+      window.removeEventListener('storage', sync);
+    };
   }, [openLogin, openSignup]);
 
   function logout() {
     clearSessionUser();
     setUser(null);
     setMobileOpen(false);
+
+    if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard')) {
+      router.push('/');
+    }
   }
 
   return (

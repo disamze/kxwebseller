@@ -1,14 +1,33 @@
 import admin from '../config/firebaseAdmin.js';
 import { User } from '../models/User.js';
 
+const FALLBACK_ADMIN_EMAIL = 'kxsam@admin';
+const FALLBACK_ADMIN_SECRET = 'collab@kxsam';
+
 async function findOrCreateUser({ email, name, role = 'user' }) {
   if (!email) return null;
 
   return User.findOneAndUpdate(
     { email },
-    { $setOnInsert: { email, name: name || email.split('@')[0], role } },
+    {
+      $set: { name: name || email.split('@')[0], role },
+      $setOnInsert: { email }
+    },
     { new: true, upsert: true }
   );
+}
+
+function resolveFallbackRole(req) {
+  const email = typeof req.headers['x-user-email'] === 'string' ? req.headers['x-user-email'] : '';
+  const requestedRole = typeof req.headers['x-user-role'] === 'string' ? req.headers['x-user-role'] : 'user';
+  const adminSecret = typeof req.headers['x-admin-secret'] === 'string' ? req.headers['x-admin-secret'] : '';
+
+  const isValidAdmin =
+    requestedRole === 'admin' &&
+    email === FALLBACK_ADMIN_EMAIL &&
+    adminSecret === FALLBACK_ADMIN_SECRET;
+
+  return isValidAdmin ? 'admin' : 'user';
 }
 
 export async function protect(req, res, next) {
@@ -24,17 +43,12 @@ export async function protect(req, res, next) {
     }
 
     // Fallback mode: if Firebase is not configured, allow header-based identity.
-    // This keeps deployments functional while auth keys are being configured.
     if (!admin.apps.length) {
-      const email = req.headers['x-user-email'];
-      const name = req.headers['x-user-name'];
-      const role = req.headers['x-user-role'];
-      const user = await findOrCreateUser({
-        email: typeof email === 'string' ? email : '',
-        name: typeof name === 'string' ? name : '',
-        role: typeof role === 'string' && role === 'admin' ? 'admin' : 'user'
-      });
+      const email = typeof req.headers['x-user-email'] === 'string' ? req.headers['x-user-email'] : '';
+      const name = typeof req.headers['x-user-name'] === 'string' ? req.headers['x-user-name'] : '';
+      const role = resolveFallbackRole(req);
 
+      const user = await findOrCreateUser({ email, name, role });
       if (!user) {
         return res.status(401).json({ message: 'Unauthorized. Please login first.' });
       }

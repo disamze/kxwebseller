@@ -23,11 +23,13 @@ export function setSessionUser(user: { email: string; name: string; role?: 'user
   localStorage.setItem('kx_user_email', user.email);
   localStorage.setItem('kx_user_name', user.name);
   localStorage.setItem('kx_user_role', user.role || 'user');
+  window.dispatchEvent(new Event('session-changed'));
 }
 
 export function tryAdminLogin(email: string, password: string) {
   if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) return false;
   setSessionUser({ email, name: 'KX Admin', role: 'admin' });
+  localStorage.setItem('kx_admin_secret', ADMIN_PASSWORD);
   return true;
 }
 
@@ -36,7 +38,9 @@ export function clearSessionUser() {
   localStorage.removeItem('kx_user_email');
   localStorage.removeItem('kx_user_name');
   localStorage.removeItem('kx_user_role');
+  localStorage.removeItem('kx_admin_secret');
   localStorage.removeItem('firebaseToken');
+  window.dispatchEvent(new Event('session-changed'));
 }
 
 export function getAuthHeaders(extra: Record<string, string> = {}) {
@@ -46,12 +50,19 @@ export function getAuthHeaders(extra: Record<string, string> = {}) {
   const session = getSessionUser();
   if (!session) return extra;
 
-  return {
+  const headers: Record<string, string> = {
     'x-user-email': session.email,
     'x-user-name': session.name,
     'x-user-role': session.role,
     ...extra
   };
+
+  if (session.role === 'admin' && typeof window !== 'undefined') {
+    const adminSecret = localStorage.getItem('kx_admin_secret');
+    if (adminSecret) headers['x-admin-secret'] = adminSecret;
+  }
+
+  return headers;
 }
 
 export function withApiBase(url: string) {

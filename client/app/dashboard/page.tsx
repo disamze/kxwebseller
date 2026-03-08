@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { API_URL, getAuthHeaders, getSessionUser } from '@/lib/api';
 
 type Material = {
@@ -15,16 +16,43 @@ const menu = ['Dashboard', 'My Courses', 'My Ebooks', 'My Test Series', 'Bookmar
 
 export default function DashboardPage() {
   const [materials, setMaterials] = useState<Material[]>([]);
+  const [allowed, setAllowed] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    const session = getSessionUser();
-    if (!session) return;
+    const sync = () => {
+      const session = getSessionUser();
+      if (!session) {
+        setAllowed(false);
+        setMaterials([]);
+        return;
+      }
 
-    fetch(`${API_URL}/users/materials`, { headers: getAuthHeaders() })
-      .then((r) => r.json())
-      .then((d) => setMaterials(Array.isArray(d) ? d : []))
-      .catch(() => setMaterials([]));
+      setAllowed(true);
+      fetch(`${API_URL}/users/materials`, { headers: getAuthHeaders() })
+        .then((r) => r.json())
+        .then((d) => setMaterials(Array.isArray(d) ? d : []))
+        .catch(() => setMaterials([]));
+    };
+
+    sync();
+    window.addEventListener('session-changed', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('session-changed', sync);
+      window.removeEventListener('storage', sync);
+    };
   }, []);
+
+  if (!allowed) {
+    return (
+      <main className="mx-auto max-w-2xl px-6 py-16">
+        <h1 className="font-heading text-3xl">Login Required</h1>
+        <p className="mt-3 text-slate-500">Please login/signup from navbar to access your dashboard.</p>
+        <button onClick={() => router.push('/')} className="mt-5 rounded-xl bg-primary px-5 py-3 text-white">Go to Home</button>
+      </main>
+    );
+  }
 
   return (
     <main className="grid min-h-[80vh] grid-cols-1 md:grid-cols-[260px_1fr]">

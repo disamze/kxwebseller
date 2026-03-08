@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AdminAnalytics } from '@/components/admin-analytics';
 import { API_URL, getAuthHeaders, getSessionUser, withApiBase } from '@/lib/api';
@@ -28,6 +29,7 @@ export default function AdminPage() {
     telegramLink: ''
   });
   const [status, setStatus] = useState('');
+  const router = useRouter();
 
   async function loadOrders() {
     const res = await fetch(`${API_URL}/orders`, { headers: getAuthHeaders() });
@@ -45,6 +47,11 @@ export default function AdminPage() {
   }
 
   async function createProduct() {
+    if (!form.title || !form.description || !form.price || !form.telegramLink) {
+      setStatus('Please fill title, description, price and telegram link.');
+      return;
+    }
+
     setStatus('Creating product...');
     const res = await fetch(`${API_URL}/products`, {
       method: 'POST',
@@ -64,10 +71,21 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    const session = getSessionUser();
-    if (!session || session.role !== 'admin') return;
-    setIsAdmin(true);
-    loadOrders();
+    const sync = () => {
+      const session = getSessionUser();
+      const ok = !!session && session.role === 'admin';
+      setIsAdmin(ok);
+      if (ok) loadOrders();
+      else setOrders([]);
+    };
+
+    sync();
+    window.addEventListener('session-changed', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('session-changed', sync);
+      window.removeEventListener('storage', sync);
+    };
   }, []);
 
   if (!isAdmin) {
@@ -76,6 +94,7 @@ export default function AdminPage() {
         <h1 className="font-heading text-3xl">Admin Access Required</h1>
         <p className="mt-3 text-slate-500">Please login from the dedicated admin login page.</p>
         <Link href="/admin-login" className="mt-5 inline-block rounded-xl bg-primary px-5 py-3 text-white">Go to Admin Login</Link>
+        <button onClick={() => router.push('/')} className="mt-3 block rounded-xl border px-5 py-3 text-sm">Back to Home</button>
       </main>
     );
   }

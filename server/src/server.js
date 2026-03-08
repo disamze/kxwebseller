@@ -4,6 +4,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
+import { getProductById, getProducts } from './controllers/productController.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -19,7 +20,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.resolve(__dirname, '../..', 'uploads')));
 
-// Friendly root endpoints so opening backend URL doesn't look broken.
 app.get('/', (_req, res) => {
   res.json({
     ok: true,
@@ -32,13 +32,16 @@ app.get('/', (_req, res) => {
 app.get('/health', (_req, res) => res.json({ ok: true }));
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
+// Explicit public aliases to avoid accidental 401 confusion on `/products` URLs.
+app.get('/products', getProducts);
+app.get('/products/:id', getProductById);
+
 // Primary API routes
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 
 // Backward-compatible aliases (helpful when NEXT_PUBLIC_API_URL is missing `/api`)
-app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/users', userRoutes);
 

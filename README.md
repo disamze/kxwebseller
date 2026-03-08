@@ -93,3 +93,8 @@ After deploy:
 ## Backend route note
 - API is available on `/api/*` (recommended).
 - Backward-compatible aliases are also enabled on `/products`, `/orders`, `/users` if `/api` is accidentally omitted.
+
+## Important auth + API notes
+- For frontend API calls, use `NEXT_PUBLIC_API_URL` ending with `/api` (example: `https://kxmaterials-api.onrender.com/api`).
+- Public product listing works on both `/api/products` and `/products`.
+- Admin actions require admin login first so `x-admin-secret` is sent in fallback mode.
