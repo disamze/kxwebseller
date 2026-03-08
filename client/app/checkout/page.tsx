@@ -1,10 +1,10 @@
 'use client';
 
+import { Suspense, FormEvent, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
 import { API_URL, getAuthToken } from '@/lib/api';
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const params = useSearchParams();
   const product = params.get('product') || '';
   const [txn, setTxn] = useState('');
@@ -52,5 +52,13 @@ export default function CheckoutPage() {
         {status ? <p className="mt-3 text-sm">{status}</p> : null}
       </form>
     </main>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<main className="mx-auto max-w-3xl px-6 py-16">Loading checkout...</main>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
