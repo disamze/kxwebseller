@@ -47,8 +47,8 @@ Backend: `http://localhost:5000`
 
 ### Server (`server/.env`)
 - `PORT=5000`
-- `MONGO_URI=`
-- `FIREBASE_SERVICE_ACCOUNT_JSON={...}`
+- `MONGO_URI=<mongodb connection string>`
+- `FIREBASE_SERVICE_ACCOUNT_JSON=<raw JSON string or base64-encoded JSON string>`
 
 ## Render deployment
 Use `render.yaml` (Blueprint) to create two services:
@@ -58,6 +58,14 @@ Use `render.yaml` (Blueprint) to create two services:
 After deploy:
 - Set frontend `NEXT_PUBLIC_API_URL` to your backend URL + `/api`
 - Ensure backend has `MONGO_URI` and `FIREBASE_SERVICE_ACCOUNT_JSON`
+
+## If Render server start fails (`npm run start` exits with code 1)
+1. Check Render logs for `Server bootstrap failed:`.
+2. Verify `MONGO_URI` is present and valid (Atlas IP allowlist + correct DB user/password).
+3. Verify `FIREBASE_SERVICE_ACCOUNT_JSON` is either:
+   - full JSON string in one line, or
+   - base64-encoded JSON string.
+4. Redeploy after saving env vars.
 
 ## Important notes
 - Uploaded screenshots are stored on server disk at `uploads/` and served via `/uploads/<filename>`.
