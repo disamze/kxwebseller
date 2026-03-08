@@ -82,11 +82,20 @@ export default function AdminPage() {
   }
 
   async function reviewOrder(id: string, decision: 'Approved' | 'Rejected') {
-    await fetch(`${API_URL}/orders/${id}/review`, {
+    setStatus(`Updating order as ${decision}...`);
+    const res = await fetch(`${API_URL}/orders/${id}/review`, {
       method: 'PATCH',
       headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ status: decision })
     });
+
+    const data = await res.json();
+    if (!res.ok) {
+      setStatus(data.message || `Failed to ${decision.toLowerCase()} order`);
+      return;
+    }
+
+    setStatus(`Order ${decision.toLowerCase()} successfully.`);
     await loadOrders();
   }
 
@@ -256,6 +265,7 @@ export default function AdminPage() {
                 </div>
               ))}
               {!orders.length ? <p className="text-sm text-slate-500">No orders found.</p> : null}
+              {status ? <p className="text-sm text-slate-500">{status}</p> : null}
             </div>
           </div>
         ) : null}

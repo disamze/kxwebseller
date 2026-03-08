@@ -1,14 +1,13 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
 import { getProductById, getProducts } from './controllers/productController.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import { uploadsDir } from './config/uploads.js';
 
 dotenv.config();
 
@@ -16,9 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.resolve(__dirname, '../..', 'uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
 app.get('/', (_req, res) => {
   res.json({
