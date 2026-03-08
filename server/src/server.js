@@ -29,16 +29,32 @@ app.use(errorHandler);
 
 const PORT = Number(process.env.PORT || 5000);
 
-async function bootstrap() {
+async function connectDBWithRetry() {
   try {
     await connectDB();
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server running on ${PORT}`);
-    });
   } catch (error) {
-    console.error('Server bootstrap failed:', error?.message || error);
-    process.exit(1);
+    console.error('MongoDB connection failed, retrying in 15s:', error?.message || error);
+    setTimeout(connectDBWithRetry, 15000);
   }
+}
+
+function registerProcessHandlers() {
+  process.on('unhandledRejection', (error) => {
+    console.error('Unhandled promise rejection:', error);
+  });
+
+  process.on('uncaughtException', (error) => {
+    console.error('Uncaught exception:', error);
+  });
+}
+
+function bootstrap() {
+  registerProcessHandlers();
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on ${PORT}`);
+    connectDBWithRetry();
+  });
 }
 
 bootstrap();
