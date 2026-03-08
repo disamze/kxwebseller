@@ -51,6 +51,9 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.get('/products', getProducts);
 app.get('/products/:id', getProductById);
 
+// Backward-compatible full product aliases (including POST /products for admin add flow).
+app.use('/products', productRoutes);
+
 // Primary API routes
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);

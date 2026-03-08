@@ -1,4 +1,11 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+function normalizeApiUrl(raw?: string) {
+  const fallback = 'http://localhost:5000/api';
+  const value = (raw || fallback).trim().replace(/\/+$/, '');
+  if (!value) return fallback;
+  return value.endsWith('/api') ? value : `${value}/api`;
+}
+
+export const API_URL = normalizeApiUrl(process.env.NEXT_PUBLIC_API_URL);
 const ADMIN_EMAIL = 'kxsam@admin';
 const ADMIN_PASSWORD = 'collab@kxsam';
 
