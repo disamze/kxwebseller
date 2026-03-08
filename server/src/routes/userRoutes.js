@@ -1,5 +1,13 @@
 import { Router } from 'express';
-import { getAnalytics, getMe, getUnlockedMaterials, syncUser, updateMe } from '../controllers/userController.js';
+import {
+  getAdminSettings,
+  getAnalytics,
+  getMe,
+  getUnlockedMaterials,
+  syncUser,
+  updateAdminSettings,
+  updateMe
+} from '../controllers/userController.js';
 import { adminOnly, protect } from '../middleware/auth.js';
 
 const router = Router();
@@ -9,5 +17,7 @@ router.get('/me', protect, getMe);
 router.patch('/me', protect, updateMe);
 router.get('/materials', protect, getUnlockedMaterials);
 router.get('/analytics', protect, adminOnly, getAnalytics);
+router.get('/admin-settings', protect, adminOnly, getAdminSettings);
+router.patch('/admin-settings', protect, adminOnly, updateAdminSettings);
 
 export default router;

@@ -29,6 +29,14 @@ type Order = {
 
 type Me = { name: string; email: string; role: string };
 
+type AdminSettings = {
+  allowNewSignups: boolean;
+  maintenanceMode: boolean;
+  updatedAt?: string;
+};
+
+const defaultSettings: AdminSettings = { allowNewSignups: true, maintenanceMode: false };
+
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -46,7 +54,8 @@ export default function AdminPage() {
     rating: '4.8'
   });
   const [status, setStatus] = useState('');
-  const [settings, setSettings] = useState({ allowNewSignups: true, maintenanceMode: false });
+  const [settings, setSettings] = useState<AdminSettings>(defaultSettings);
+  const [settingsStatus, setSettingsStatus] = useState('');
   const router = useRouter();
 
   async function loadOrders() {
@@ -58,9 +67,18 @@ export default function AdminPage() {
   async function loadProfile() {
     const res = await fetch(`${API_URL}/users/me`, { headers: getAuthHeaders() });
     const data = await res.json();
-    if (res.ok && data?.email) {
-      setMe(data);
+    if (res.ok && data?.email) setMe(data);
+  }
+
+  async function loadSettings() {
+    const res = await fetch(`${API_URL}/users/admin-settings`, { headers: getAuthHeaders() });
+    const data = await res.json();
+    if (!res.ok) {
+      setSettingsStatus(data.message || 'Failed to load settings');
+      return;
     }
+    setSettings(data);
+    setSettingsStatus('');
   }
 
   async function reviewOrder(id: string, decision: 'Approved' | 'Rejected') {
@@ -116,6 +134,22 @@ export default function AdminPage() {
     }
   }
 
+  async function saveSettings() {
+    setSettingsStatus('Saving settings...');
+    const res = await fetch(`${API_URL}/users/admin-settings`, {
+      method: 'PATCH',
+      headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(settings)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setSettingsStatus(data.message || 'Failed to save settings');
+      return;
+    }
+    setSettings(data);
+    setSettingsStatus('Settings saved successfully.');
+  }
+
   useEffect(() => {
     const sync = () => {
       const session = getSessionUser();
@@ -124,6 +158,7 @@ export default function AdminPage() {
       if (ok) {
         loadOrders();
         loadProfile();
+        loadSettings();
       } else {
         setOrders([]);
       }
@@ -240,6 +275,7 @@ export default function AdminPage() {
                 <input value={me.name} onChange={(e) => setMe((s) => (s ? { ...s, name: e.target.value } : s))} className="rounded-xl border p-3" />
                 <input value={me.email} disabled className="rounded-xl border bg-slate-100 p-3 dark:bg-slate-800" />
                 <button onClick={saveAdminProfile} className="rounded-xl bg-primary px-5 py-3 text-white">Save Profile</button>
+                {status ? <p className="text-sm text-slate-500">{status}</p> : null}
               </div>
             ) : <p className="mt-3 text-sm text-slate-500">Unable to load profile.</p>}
           </div>
@@ -257,7 +293,9 @@ export default function AdminPage() {
                 <span>Maintenance mode</span>
                 <input type="checkbox" checked={settings.maintenanceMode} onChange={(e) => setSettings((s) => ({ ...s, maintenanceMode: e.target.checked }))} />
               </label>
-              <p className="text-xs text-slate-500">These are dashboard-level settings and can be wired to backend config in next iteration.</p>
+              <button onClick={saveSettings} className="rounded-xl bg-primary px-5 py-3 text-white">Save Settings</button>
+              {settings.updatedAt ? <p className="text-xs text-slate-500">Last updated: {new Date(settings.updatedAt).toLocaleString()}</p> : null}
+              {settingsStatus ? <p className="text-sm text-slate-500">{settingsStatus}</p> : null}
             </div>
           </div>
         ) : null}

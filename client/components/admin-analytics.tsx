@@ -15,25 +15,45 @@ type Analytics = {
   topProducts: { title: string; purchases: number }[];
 };
 
+function isAnalyticsPayload(data: any): data is Analytics {
+  return (
+    data &&
+    typeof data.totalUsers === 'number' &&
+    typeof data.totalOrders === 'number' &&
+    typeof data.approvedOrders === 'number' &&
+    typeof data.revenue === 'number' &&
+    Array.isArray(data.topProducts)
+  );
+}
+
 export function AdminAnalytics() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetch(`${API_URL}/users/analytics`, { headers: getAuthHeaders() })
-      .then((r) => r.json())
-      .then((d) => setAnalytics(d))
-      .catch(() => setAnalytics(null));
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(data?.message || 'Failed to fetch analytics');
+        if (!isAnalyticsPayload(data)) throw new Error('Invalid analytics response');
+        setAnalytics(data);
+        setError('');
+      })
+      .catch((e) => {
+        setAnalytics(null);
+        setError(e?.message || 'Unable to load analytics right now.');
+      });
   }, []);
 
   if (!analytics) {
-    return <p className="text-sm text-slate-500">Unable to load analytics right now.</p>;
+    return <p className="text-sm text-slate-500">{error || 'Unable to load analytics right now.'}</p>;
   }
 
   const topLabels = analytics.topProducts.length ? analytics.topProducts.map((p) => p.title) : ['No data'];
   const topValues = analytics.topProducts.length ? analytics.topProducts.map((p) => p.purchases) : [0];
 
   const data = {
-    labels: ['Users', 'Orders', 'Approved Orders', 'Revenue'] as string[],
+    labels: ['Users', 'Orders', 'Approved Orders', 'Revenue'],
     datasets: [{
       label: 'Platform Metrics',
       data: [analytics.totalUsers, analytics.totalOrders, analytics.approvedOrders, analytics.revenue],

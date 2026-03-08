@@ -2,7 +2,10 @@ import mongoose from 'mongoose';
 import { Order } from '../models/Order.js';
 import { User } from '../models/User.js';
 import { Product } from '../models/Product.js';
+import { PlatformSetting } from '../models/PlatformSetting.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+
+const SETTINGS_KEY = 'global';
 
 export const syncUser = asyncHandler(async (req, res) => {
   const { email, name } = req.body;
@@ -23,7 +26,7 @@ export const syncUser = asyncHandler(async (req, res) => {
 export const getUnlockedMaterials = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).populate('purchasedProducts');
 
-  const unlocked = user.purchasedProducts.map((p) => ({
+  const unlocked = (user?.purchasedProducts || []).map((p) => ({
     id: p._id,
     title: p.title,
     thumbnail: p.thumbnail,
@@ -51,9 +54,9 @@ export const updateMe = asyncHandler(async (req, res) => {
 });
 
 export const getAnalytics = asyncHandler(async (_req, res) => {
-  const [users, orders, approvedOrders] = await Promise.all([
+  const [totalUsers, totalOrders, approvedOrders] = await Promise.all([
     User.countDocuments(),
-    Order.find(),
+    Order.countDocuments(),
     Order.find({ status: 'Approved' })
   ]);
 
@@ -88,10 +91,43 @@ export const getAnalytics = asyncHandler(async (_req, res) => {
   });
 
   res.json({
-    totalUsers: users,
-    totalOrders: orders.length,
+    totalUsers,
+    totalOrders,
     approvedOrders: approvedOrders.length,
     revenue,
     topProducts
+  });
+});
+
+export const getAdminSettings = asyncHandler(async (_req, res) => {
+  const settings = await PlatformSetting.findOneAndUpdate(
+    { key: SETTINGS_KEY },
+    { $setOnInsert: { key: SETTINGS_KEY, allowNewSignups: true, maintenanceMode: false } },
+    { new: true, upsert: true }
+  );
+
+  res.json({
+    allowNewSignups: settings.allowNewSignups,
+    maintenanceMode: settings.maintenanceMode,
+    updatedAt: settings.updatedAt
+  });
+});
+
+export const updateAdminSettings = asyncHandler(async (req, res) => {
+  const payload = {
+    allowNewSignups: Boolean(req.body.allowNewSignups),
+    maintenanceMode: Boolean(req.body.maintenanceMode)
+  };
+
+  const settings = await PlatformSetting.findOneAndUpdate(
+    { key: SETTINGS_KEY },
+    { $set: payload, $setOnInsert: { key: SETTINGS_KEY } },
+    { new: true, upsert: true }
+  );
+
+  res.json({
+    allowNewSignups: settings.allowNewSignups,
+    maintenanceMode: settings.maintenanceMode,
+    updatedAt: settings.updatedAt
   });
 });
