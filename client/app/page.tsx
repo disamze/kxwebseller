@@ -1,6 +1,7 @@
 import { ProductCard } from '@/components/product-card';
 import { getProducts } from '@/lib/products';
 import { UserHandlingSection } from '@/components/user-handling-section';
+import { CustomerPurchasesSection } from '@/components/customer-purchases-section';
 
 export default async function HomePage() {
   const products = await getProducts();
@@ -20,6 +21,7 @@ export default async function HomePage() {
         {products.map((p) => <ProductCard key={p._id || p.id} {...p} />)}
       </section>
       <UserHandlingSection />
+      <CustomerPurchasesSection />
     </main>
   );
 }

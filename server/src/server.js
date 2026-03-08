@@ -29,6 +29,21 @@ app.get('/', (_req, res) => {
     note: 'Use /api/* routes from frontend. Non-/api aliases are also enabled.'
   });
 });
+
+// Friendly /api index so opening the API base URL does not return Route not found.
+app.get('/api', (_req, res) => {
+  res.json({
+    ok: true,
+    message: 'KXMATERIALS API base endpoint',
+    endpoints: {
+      health: '/api/health',
+      products: '/api/products',
+      orders: '/api/orders',
+      users: '/api/users'
+    }
+  });
+});
+
 app.get('/health', (_req, res) => res.json({ ok: true }));
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 

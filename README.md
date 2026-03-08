@@ -98,3 +98,8 @@ After deploy:
 - For frontend API calls, use `NEXT_PUBLIC_API_URL` ending with `/api` (example: `https://kxmaterials-api.onrender.com/api`).
 - Public product listing works on both `/api/products` and `/products`.
 - Admin actions require admin login first so `x-admin-secret` is sent in fallback mode.
+
+
+## API base check
+- Open `https://<your-backend>.onrender.com/api` to confirm API is live (returns endpoint map).
+- If you open unknown paths, you will see `{ "message": "Route not found" }` by design.
