@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { API_URL, getAuthToken } from '@/lib/api';
+import { API_URL, getAuthHeaders, getSessionUser } from '@/lib/api';
 
 type Material = {
   id: string;
@@ -17,10 +17,10 @@ export default function DashboardPage() {
   const [materials, setMaterials] = useState<Material[]>([]);
 
   useEffect(() => {
-    const token = getAuthToken();
-    if (!token) return;
+    const session = getSessionUser();
+    if (!session) return;
 
-    fetch(`${API_URL}/users/materials`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_URL}/users/materials`, { headers: getAuthHeaders() })
       .then((r) => r.json())
       .then((d) => setMaterials(Array.isArray(d) ? d : []))
       .catch(() => setMaterials([]));

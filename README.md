@@ -11,6 +11,8 @@ Modern full-stack digital learning marketplace that delivers purchased materials
 - Payment proof storage: local upload folder (`/uploads`)
 
 ## Implemented workflow (end-to-end)
+- Dedicated admin login page: `/admin-login`
+- Admin credentials (demo): `kxsam@admin` / `collab@kxsam`
 1. User opens product and clicks **Buy Now**.
 2. User pays via UPI QR on `/checkout`.
 3. User uploads payment screenshot (and optional UTR/transaction id).
@@ -18,6 +20,14 @@ Modern full-stack digital learning marketplace that delivers purchased materials
 5. Admin opens `/admin`, reviews screenshot, and clicks **Approve** or **Reject**.
 6. On approval, product is added to user's `purchasedProducts`.
 7. User opens `/dashboard` and can click **Join Telegram Channel** for unlocked products.
+
+## Auth behavior
+- Separate admin login route: `/admin-login`
+- Admin credentials: `kxsam@admin` / `collab@kxsam`
+- User login/signup remains separate via navbar modal
+- If Firebase Admin is configured and a valid Firebase token is sent, API uses Firebase auth.
+- If Firebase Admin is not configured yet, API accepts header-based session identity (`x-user-email`, `x-user-name`, `x-user-role`) so the app remains usable.
+- The login modal sets this session in browser storage for quick user/admin testing.
 
 ## API highlights
 - `GET /api/products`

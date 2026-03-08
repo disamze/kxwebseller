@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { AdminAnalytics } from '@/components/admin-analytics';
-import { API_URL, getAuthToken, withApiBase } from '@/lib/api';
+import Link from 'next/link';
+import { API_URL, getAuthHeaders, getSessionUser, withApiBase } from '@/lib/api';
 
 const items = ['Overview', 'Add Course', 'Add Ebook', 'Add Test Series', 'Manage Products', 'Orders', 'Users', 'Analytics', 'Settings'];
 
@@ -17,29 +18,40 @@ type Order = {
 
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   async function loadOrders() {
-    const token = getAuthToken();
-    if (!token) return;
-    const res = await fetch(`${API_URL}/orders`, { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`${API_URL}/orders`, { headers: getAuthHeaders() });
     const data = await res.json();
     setOrders(Array.isArray(data) ? data : []);
   }
 
   async function reviewOrder(id: string, status: 'Approved' | 'Rejected') {
-    const token = getAuthToken();
-    if (!token) return;
     await fetch(`${API_URL}/orders/${id}/review`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ status })
     });
     await loadOrders();
   }
 
   useEffect(() => {
+    const session = getSessionUser();
+    if (!session || session.role !== 'admin') return;
+    setIsAdmin(true);
     loadOrders();
   }, []);
+
+
+  if (!isAdmin) {
+    return (
+      <main className="mx-auto max-w-2xl px-6 py-16">
+        <h1 className="font-heading text-3xl">Admin Access Required</h1>
+        <p className="mt-3 text-slate-500">Please login from the dedicated admin login page.</p>
+        <Link href="/admin-login" className="mt-5 inline-block rounded-xl bg-primary px-5 py-3 text-white">Go to Admin Login</Link>
+      </main>
+    );
+  }
 
   return (
     <main className="grid min-h-[80vh] grid-cols-1 md:grid-cols-[260px_1fr]">

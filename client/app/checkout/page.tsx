@@ -2,7 +2,7 @@
 
 import { Suspense, FormEvent, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { API_URL, getAuthToken } from '@/lib/api';
+import { API_URL, getAuthHeaders, getSessionUser } from '@/lib/api';
 
 function CheckoutContent() {
   const params = useSearchParams();
@@ -14,8 +14,8 @@ function CheckoutContent() {
   async function submitPayment(e: FormEvent) {
     e.preventDefault();
     if (!file) return setStatus('Please upload payment screenshot.');
-    const token = getAuthToken();
-    if (!token) return setStatus('Please login first to submit payment proof.');
+    const session = getSessionUser();
+    if (!session) return setStatus('Please login first to submit payment proof.');
 
     const formData = new FormData();
     formData.append('productId', product);
@@ -24,7 +24,7 @@ function CheckoutContent() {
 
     const res = await fetch(`${API_URL}/orders`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getAuthHeaders(),
       body: formData
     });
 
