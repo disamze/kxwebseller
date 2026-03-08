@@ -1,4 +1,3 @@
-import cloudinary from '../config/cloudinary.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { Order } from '../models/Order.js';
 import { User } from '../models/User.js';
@@ -6,15 +5,24 @@ import { User } from '../models/User.js';
 const validStatuses = new Set(['Pending', 'Approved', 'Rejected']);
 
 export const createOrder = asyncHandler(async (req, res) => {
-  const screenshot = req.file
-    ? await cloudinary.uploader.upload(req.file.path, { folder: 'edumarket/orders' })
-    : null;
+  const { productId, amount, transactionId } = req.body;
+
+  if (!productId) {
+    res.status(400);
+    throw new Error('productId is required');
+  }
+
+  if (!req.file) {
+    res.status(400);
+    throw new Error('paymentScreenshot is required');
+  }
 
   const order = await Order.create({
     userId: req.user._id,
-    productId: req.body.productId,
-    amount: req.body.amount,
-    paymentScreenshot: screenshot?.secure_url,
+    productId,
+    amount,
+    transactionId,
+    paymentScreenshot: `/uploads/${req.file.filename}`,
     status: 'Pending'
   });
 
@@ -50,6 +58,10 @@ export const reviewOrder = asyncHandler(async (req, res) => {
 });
 
 export const getAllOrders = asyncHandler(async (_req, res) => {
-  const orders = await Order.find().populate('userId', 'name email').populate('productId', 'title');
+  const orders = await Order.find()
+    .populate('userId', 'name email')
+    .populate('productId', 'title telegramLink type thumbnail')
+    .sort({ createdAt: -1 });
+
   res.json(orders);
 });

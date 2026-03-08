@@ -1,6 +1,31 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { API_URL, getAuthToken } from '@/lib/api';
+
+type Material = {
+  id: string;
+  title: string;
+  thumbnail: string;
+  type: string;
+  telegramLink: string;
+};
+
 const menu = ['Dashboard', 'My Courses', 'My Ebooks', 'My Test Series', 'Bookmarks', 'Settings', 'Logout'];
 
 export default function DashboardPage() {
+  const [materials, setMaterials] = useState<Material[]>([]);
+
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) return;
+
+    fetch(`${API_URL}/users/materials`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((d) => setMaterials(Array.isArray(d) ? d : []))
+      .catch(() => setMaterials([]));
+  }, []);
+
   return (
     <main className="grid min-h-[80vh] grid-cols-1 md:grid-cols-[260px_1fr]">
       <aside className="border-r p-6">
@@ -18,10 +43,15 @@ export default function DashboardPage() {
         <div className="mt-8 rounded-2xl border p-5">
           <h3 className="font-heading text-xl">Unlocked Materials</h3>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <article className="rounded-xl border p-4">
-              <p className="font-medium">Next.js Mastery Bootcamp</p>
-              <button className="mt-3 rounded-lg bg-accent px-4 py-2 text-white">Join Telegram Channel</button>
-            </article>
+            {materials.length ? materials.map((item) => (
+              <article key={item.id} className="rounded-xl border p-4">
+                <p className="font-medium">{item.title}</p>
+                <p className="text-xs text-slate-500">{item.type}</p>
+                <a href={item.telegramLink} target="_blank" className="mt-3 inline-block rounded-lg bg-accent px-4 py-2 text-white" rel="noreferrer">
+                  Join Telegram Channel
+                </a>
+              </article>
+            )) : <p className="text-sm text-slate-500">No unlocked materials yet. Once admin approves your order, it will appear here.</p>}
           </div>
         </div>
       </section>
