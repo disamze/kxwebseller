@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, FormEvent, useState } from 'react';
+import { Suspense, FormEvent, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { API_URL, getAuthHeaders, getSessionUser } from '@/lib/api';
 
@@ -9,7 +9,16 @@ function CheckoutContent() {
   const product = params.get('product') || '';
   const [txn, setTxn] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [amount, setAmount] = useState<number | null>(null);
   const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    if (!product) return;
+    fetch(`${API_URL}/products/${product}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setAmount(d?.price || null))
+      .catch(() => setAmount(null));
+  }, [product]);
 
   async function submitPayment(e: FormEvent) {
     e.preventDefault();
@@ -20,6 +29,7 @@ function CheckoutContent() {
     const formData = new FormData();
     formData.append('productId', product);
     formData.append('transactionId', txn);
+    if (amount) formData.append('amount', String(amount));
     formData.append('paymentScreenshot', file);
 
     const res = await fetch(`${API_URL}/orders`, {
@@ -41,6 +51,7 @@ function CheckoutContent() {
       <form onSubmit={submitPayment} className="mt-8 rounded-2xl border p-6 shadow-sm">
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=kxmaterials@upi" alt="UPI QR" className="mx-auto" />
         <p className="mt-5 text-center">UPI ID: <b>kxmaterials@upi</b></p>
+        {amount ? <p className="mt-2 text-center text-sm">Amount to pay: <b>₹{amount}</b></p> : null}
         <ol className="mt-4 list-decimal space-y-2 pl-6 text-sm text-slate-600 dark:text-slate-300">
           <li>Scan QR and complete payment.</li>
           <li>Upload payment screenshot and add transaction ID.</li>

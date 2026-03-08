@@ -1,8 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { AdminAnalytics } from '@/components/admin-analytics';
-import Link from 'next/link';
 import { API_URL, getAuthHeaders, getSessionUser, withApiBase } from '@/lib/api';
 
 const items = ['Overview', 'Add Course', 'Add Ebook', 'Add Test Series', 'Manage Products', 'Orders', 'Users', 'Analytics', 'Settings'];
@@ -19,6 +19,15 @@ type Order = {
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    price: '',
+    thumbnail: '',
+    type: 'course',
+    telegramLink: ''
+  });
+  const [status, setStatus] = useState('');
 
   async function loadOrders() {
     const res = await fetch(`${API_URL}/orders`, { headers: getAuthHeaders() });
@@ -35,13 +44,31 @@ export default function AdminPage() {
     await loadOrders();
   }
 
+  async function createProduct() {
+    setStatus('Creating product...');
+    const res = await fetch(`${API_URL}/products`, {
+      method: 'POST',
+      headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        ...form,
+        price: Number(form.price)
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setStatus(data.message || 'Failed to create product');
+      return;
+    }
+    setStatus('Product created successfully.');
+    setForm({ title: '', description: '', price: '', thumbnail: '', type: 'course', telegramLink: '' });
+  }
+
   useEffect(() => {
     const session = getSessionUser();
     if (!session || session.role !== 'admin') return;
     setIsAdmin(true);
     loadOrders();
   }, []);
-
 
   if (!isAdmin) {
     return (
@@ -63,13 +90,14 @@ export default function AdminPage() {
         <div className="rounded-2xl border p-5">
           <h3 className="font-heading text-xl">Add Product</h3>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <input className="rounded-xl border p-3" placeholder="Title" />
-            <input className="rounded-xl border p-3" placeholder="Price" />
-            <input className="rounded-xl border p-3" placeholder="Thumbnail URL" />
-            <select className="rounded-xl border p-3"><option>course</option><option>ebook</option><option>test</option></select>
-            <input className="rounded-xl border p-3 md:col-span-2" placeholder="Telegram invite link" />
-            <textarea className="rounded-xl border p-3 md:col-span-2" placeholder="Description" />
-            <button className="rounded-xl bg-primary px-5 py-3 text-white md:col-span-2">Create Product</button>
+            <input value={form.title} onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))} className="rounded-xl border p-3" placeholder="Title" />
+            <input value={form.price} onChange={(e) => setForm((s) => ({ ...s, price: e.target.value }))} className="rounded-xl border p-3" placeholder="Price" />
+            <input value={form.thumbnail} onChange={(e) => setForm((s) => ({ ...s, thumbnail: e.target.value }))} className="rounded-xl border p-3" placeholder="Thumbnail URL" />
+            <select value={form.type} onChange={(e) => setForm((s) => ({ ...s, type: e.target.value }))} className="rounded-xl border p-3"><option>course</option><option>ebook</option><option>test</option></select>
+            <input value={form.telegramLink} onChange={(e) => setForm((s) => ({ ...s, telegramLink: e.target.value }))} className="rounded-xl border p-3 md:col-span-2" placeholder="Telegram invite link" />
+            <textarea value={form.description} onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))} className="rounded-xl border p-3 md:col-span-2" placeholder="Description" />
+            <button onClick={createProduct} className="rounded-xl bg-primary px-5 py-3 text-white md:col-span-2">Create Product</button>
+            {status ? <p className="text-sm text-slate-500 md:col-span-2">{status}</p> : null}
           </div>
         </div>
 

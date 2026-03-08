@@ -1,7 +1,10 @@
 import { ProductCard } from '@/components/product-card';
-import { products } from '@/lib/mock-data';
+import { getProducts } from '@/lib/products';
+import { UserHandlingSection } from '@/components/user-handling-section';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const products = await getProducts();
+
   return (
     <main>
       <section className="relative overflow-hidden px-6 pb-20 pt-24 text-center">
@@ -13,9 +16,10 @@ export default function HomePage() {
           <a href="/explore" className="rounded-xl border px-6 py-3">Start Learning</a>
         </div>
       </section>
-      <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-20 md:grid-cols-3">
-        {products.map((p) => <ProductCard key={p.id} {...p} />)}
+      <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-12 md:grid-cols-3">
+        {products.map((p) => <ProductCard key={p._id || p.id} {...p} />)}
       </section>
+      <UserHandlingSection />
     </main>
   );
 }
