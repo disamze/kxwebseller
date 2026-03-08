@@ -19,10 +19,28 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.resolve(__dirname, '../..', 'uploads')));
 
+// Friendly root endpoints so opening backend URL doesn't look broken.
+app.get('/', (_req, res) => {
+  res.json({
+    ok: true,
+    service: 'KXMATERIALS API',
+    health: '/api/health',
+    routes: ['/api/products', '/api/orders', '/api/users'],
+    note: 'Use /api/* routes from frontend. Non-/api aliases are also enabled.'
+  });
+});
+app.get('/health', (_req, res) => res.json({ ok: true }));
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
+// Primary API routes
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
+
+// Backward-compatible aliases (helpful when NEXT_PUBLIC_API_URL is missing `/api`)
+app.use('/products', productRoutes);
+app.use('/orders', orderRoutes);
+app.use('/users', userRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

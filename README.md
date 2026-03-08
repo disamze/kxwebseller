@@ -68,6 +68,7 @@ Use `render.yaml` (Blueprint) to create two services:
 After deploy:
 - Set frontend `NEXT_PUBLIC_API_URL` to your backend URL + `/api`
 - Ensure backend has `MONGO_URI` and `FIREBASE_SERVICE_ACCOUNT_JSON`
+- Keep frontend `NEXT_PUBLIC_API_URL` as `https://<your-backend>.onrender.com/api`
 
 ## Render start crash fix included
 - Server now starts HTTP listener first and retries MongoDB connection in background every 15 seconds.
@@ -87,3 +88,8 @@ After deploy:
 ## Important notes
 - Uploaded screenshots are stored on server disk at `uploads/` and served via `/uploads/<filename>`.
 - For production-scale durability, move uploads to persistent object storage/CDN later.
+
+
+## Backend route note
+- API is available on `/api/*` (recommended).
+- Backward-compatible aliases are also enabled on `/products`, `/orders`, `/users` if `/api` is accidentally omitted.
