@@ -99,6 +99,25 @@ export const getAnalytics = asyncHandler(async (_req, res) => {
   });
 });
 
+
+export const getAdminUsers = asyncHandler(async (_req, res) => {
+  const users = await User.find()
+    .select('name email role createdAt purchasedProducts')
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const formatted = users.map((u) => ({
+    _id: u._id,
+    name: u.name || 'Unnamed user',
+    email: u.email,
+    role: u.role,
+    createdAt: u.createdAt,
+    purchasedCount: Array.isArray(u.purchasedProducts) ? u.purchasedProducts.length : 0
+  }));
+
+  res.json(formatted);
+});
+
 export const getAdminSettings = asyncHandler(async (_req, res) => {
   const settings = await PlatformSetting.findOneAndUpdate(
     { key: SETTINGS_KEY },

@@ -55,6 +55,39 @@ export const createProduct = asyncHandler(async (req, res) => {
   }
 });
 
+export const updateProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  try {
+    const payload = normalizeProductPayload({
+      ...product.toObject(),
+      ...req.body
+    });
+
+    Object.assign(product, payload);
+    await product.save();
+    res.json(product);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message || 'Invalid product payload');
+  }
+});
+
+export const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  await product.deleteOne();
+  res.json({ message: 'Product deleted successfully' });
+});
+
 export const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (!product) {
