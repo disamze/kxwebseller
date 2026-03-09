@@ -5,7 +5,32 @@ import { ContactUsSection } from '@/components/contact-us-section';
 const faqs = [
   { q: 'How do I access my course after payment?', a: 'After admin approval, your dashboard unlocks Telegram access links instantly.' },
   { q: 'How long is validity?', a: 'Most products include long-term validity; course-specific validity is shown on product cards.' },
-  { q: 'Do you offer refund?', a: 'Because content is digital, refunds are handled only for duplicate/failed transactions after verification.' }
+  { q: 'Do you offer refund?', a: 'Because content is digital, refunds are handled only for duplicate/failed transactions after verification.' },
+  { q: 'Can I buy more than one course together?', a: 'Yes. You can place multiple orders and all approved products appear in your dashboard separately.' },
+  { q: 'Is mentor support available after purchase?', a: 'Yes, support is available through our guided channels and update groups for enrolled students.' },
+  { q: 'Will I get updates if content changes?', a: 'Absolutely. Whenever batches or materials are updated, you receive revised access/resources as applicable.' },
+  { q: 'Do these courses help both Boards and competitive exams?', a: 'Yes, many plans are designed with a hybrid strategy for concept clarity plus exam scoring techniques.' }
+];
+
+const testimonials = [
+  {
+    name: 'Riya Sharma',
+    score: '96% Boards',
+    text: 'I switched to KXMATERIALS 3 months before exams. The revision maps and practice tests gave me confidence and clarity.',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80'
+  },
+  {
+    name: 'Aman Verma',
+    score: 'AIR 422',
+    text: 'Mentor support and fast doubt solutions were game-changing. Every lecture felt practical and focused on scoring marks.',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80'
+  },
+  {
+    name: 'Sneha Patel',
+    score: '95 in Physics',
+    text: 'My favorite part was the PYQ strategy framework. I was able to target important topics and improve quickly.',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=300&q=80'
+  }
 ];
 
 const testimonials = [
@@ -44,15 +69,15 @@ export default async function HomePage() {
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }} />
-        <div className="animate-drift absolute left-4 top-24 rounded-2xl border border-white/40 bg-white/10 px-4 py-3 text-xs font-medium text-white shadow-lg backdrop-blur-lg sm:left-10">
+        <div className="animate-drift absolute left-4 top-10 z-10 rounded-2xl border border-cyan-200/60 bg-cyan-50/90 px-4 py-3 text-xs font-semibold text-cyan-900 shadow-lg backdrop-blur-lg sm:left-10 sm:top-16">
           ⚡ Personal mentor guidance
         </div>
-        <div className="animate-drift-reverse absolute right-4 top-40 rounded-2xl border border-white/40 bg-white/10 px-4 py-3 text-xs font-medium text-white shadow-lg backdrop-blur-lg sm:right-10">
+        <div className="animate-drift-reverse absolute right-4 top-20 z-10 rounded-2xl border border-indigo-200/60 bg-indigo-50/90 px-4 py-3 text-xs font-semibold text-indigo-900 shadow-lg backdrop-blur-lg sm:right-10 sm:top-28">
           ✅ Verified payment support
         </div>
         <div className="mx-auto grid w-full max-w-7xl items-center gap-14 lg:grid-cols-2">
           <div className="animate-fade-up text-center text-white lg:text-left">
-            <p className="inline-block rounded-full border border-white/40 bg-white/10 px-4 py-1 text-xs font-semibold tracking-[0.18em]">TRUSTED BY 12,000+ LEARNERS</p>
+            <p className="inline-block rounded-full border border-cyan-200/70 bg-cyan-50/90 px-4 py-1 text-xs font-semibold tracking-[0.18em] text-cyan-900">TRUSTED BY 12,000+ LEARNERS</p>
             <h1 className="mt-5 font-heading text-4xl font-bold leading-tight sm:text-6xl">A Premium Learning Experience That Looks as Serious as Your Dreams.</h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-slate-100/90 sm:text-lg lg:mx-0">KXMATERIALS combines strategic mentorship, modern tech and exam-focused learning assets to help students win in Boards and competitive exams.</p>
             <div className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
@@ -62,7 +87,7 @@ export default async function HomePage() {
           </div>
 
           <div className="animate-float">
-            <div className="glass rounded-3xl p-5 text-white shadow-2xl">
+            <div className="glass rounded-3xl border border-slate-200/60 bg-white/85 p-5 text-slate-900 shadow-2xl dark:border-slate-700 dark:bg-slate-900/75 dark:text-white">
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
                   ['95%+', 'Student satisfaction'],
@@ -70,13 +95,13 @@ export default async function HomePage() {
                   ['500+', 'Video lectures'],
                   ['24/7', 'Telegram support']
                 ].map(([value, label]) => (
-                  <div key={label} className="rounded-2xl border border-white/30 bg-white/10 p-4">
+                  <div key={label} className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 dark:border-white/30 dark:bg-white/10">
                     <p className="text-3xl font-bold">{value}</p>
-                    <p className="mt-1 text-sm text-slate-200">{label}</p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-200">{label}</p>
                   </div>
                 ))}
               </div>
-              <p className="mt-4 text-sm text-slate-200">Fast onboarding • Reliable payment verification • Instant dashboard access after approval</p>
+              <p className="mt-4 text-sm text-slate-600 dark:text-slate-200">Fast onboarding • Reliable payment verification • Instant dashboard access after approval</p>
             </div>
           </div>
         </div>

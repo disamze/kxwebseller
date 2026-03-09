@@ -63,6 +63,21 @@ Backend: `http://localhost:5000`
 - `RESEND_API_KEY=<resend api key for contact emails>`
 - `CONTACT_RECEIVER_EMAIL=disamaze@gmail.com`
 - `CONTACT_SENDER_EMAIL=onboarding@resend.dev`
+- `ENABLE_SELF_PING=true`
+- `SELF_PING_INTERVAL_MS=720000`
+- `SELF_PING_URL=http://127.0.0.1:5000/api/health`
+
+
+## Prevent Render cold starts (keep awake)
+- Free Render web services can still sleep when there is no external traffic for a while.
+- This repo now includes built-in keepalive:
+  - Frontend browser heartbeat (`SiteKeepAlive`) pings client + API every 60s while a user has the site open.
+  - Backend self-ping (`ENABLE_SELF_PING=true`) pings `/api/health` on an interval.
+- For truly 24/7 no-sleep behavior, use one of these:
+  1. Upgrade Render plan to non-sleep tier, or
+  2. Configure an external uptime monitor (UptimeRobot/Cron-job.org) to hit both URLs every 5 minutes:
+     - `https://<your-api>.onrender.com/api/health`
+     - `https://<your-client>.onrender.com/`
 
 ## Render deployment
 Use `render.yaml` (Blueprint) to create two services:

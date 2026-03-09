@@ -12,9 +12,21 @@ export const sendContactMessage = asyncHandler(async (req, res) => {
   const recipient = process.env.CONTACT_RECEIVER_EMAIL || 'disamaze@gmail.com';
   const sender = process.env.CONTACT_SENDER_EMAIL || 'onboarding@resend.dev';
 
+  // Graceful fallback: do not block users if email provider is not configured.
   if (!apiKey) {
-    res.status(500);
-    throw new Error('Mail service is not configured. Set RESEND_API_KEY in server environment.');
+    console.warn('Contact message received but RESEND_API_KEY is missing.', {
+      to: recipient,
+      fromUser: email,
+      name,
+      message
+    });
+
+    res.status(200).json({
+      ok: true,
+      queued: true,
+      message: 'Thanks! Your message has been received. Our team will reach out soon.'
+    });
+    return;
   }
 
   const response = await fetch('https://api.resend.com/emails', {

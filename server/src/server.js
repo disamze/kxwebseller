@@ -77,6 +77,27 @@ async function connectDBWithRetry() {
   }
 }
 
+
+function startSelfPing() {
+  const enabled = (process.env.ENABLE_SELF_PING || 'true').toLowerCase() === 'true';
+  if (!enabled) return;
+
+  const intervalMs = Number(process.env.SELF_PING_INTERVAL_MS || 12 * 60 * 1000);
+  const baseUrl = process.env.SELF_PING_URL || `http://127.0.0.1:${PORT}/api/health`;
+
+  const ping = async () => {
+    try {
+      await fetch(baseUrl, { method: 'GET' });
+    } catch (error) {
+      console.warn('Self-ping failed:', error?.message || error);
+    }
+  };
+
+  ping();
+  setInterval(ping, intervalMs);
+  console.log(`Self-ping enabled: ${baseUrl} every ${Math.round(intervalMs / 1000)}s`);
+}
+
 function registerProcessHandlers() {
   process.on('unhandledRejection', (error) => {
     console.error('Unhandled promise rejection:', error);
@@ -93,6 +114,7 @@ function bootstrap() {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on ${PORT}`);
     connectDBWithRetry();
+    startSelfPing();
   });
 }
 
