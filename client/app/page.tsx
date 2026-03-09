@@ -33,6 +33,27 @@ const testimonials = [
   }
 ];
 
+const testimonials = [
+  {
+    name: 'Riya Sharma',
+    score: '96% Boards',
+    text: 'I switched to KXMATERIALS 3 months before exams. The revision maps and practice tests gave me confidence and clarity.',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80'
+  },
+  {
+    name: 'Aman Verma',
+    score: 'AIR 422',
+    text: 'Mentor support and fast doubt solutions were game-changing. Every lecture felt practical and focused on scoring marks.',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80'
+  },
+  {
+    name: 'Sneha Patel',
+    score: '95 in Physics',
+    text: 'My favorite part was the PYQ strategy framework. I was able to target important topics and improve quickly.',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=300&q=80'
+  }
+];
+
 export default async function HomePage() {
   const products = await getProducts();
 
