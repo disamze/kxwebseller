@@ -24,10 +24,10 @@ Modern full-stack digital learning marketplace that delivers purchased materials
 ## Auth behavior
 - Separate admin login route: `/admin-login`
 - Admin credentials: `kxsam@admin` / `collab@kxsam`
-- User login/signup remains separate via navbar modal
+- User login/signup now uses dedicated pages: `/login` and `/signup`
 - If Firebase Admin is configured and a valid Firebase token is sent, API uses Firebase auth.
 - If Firebase Admin is not configured yet, API accepts header-based session identity (`x-user-email`, `x-user-name`, `x-user-role`) so the app remains usable.
-- The login modal sets this session in browser storage for quick user/admin testing.
+- Login/signup pages set session data in browser storage for quick user/admin testing.
 
 ## API highlights
 - `GET /api/products`
@@ -37,6 +37,7 @@ Modern full-stack digital learning marketplace that delivers purchased materials
 - `GET /api/orders` (admin)
 - `PATCH /api/orders/:id/review` (admin)
 - `GET /api/users/materials` (auth, returns only unlocked products)
+- `POST /api/contact` (public, sends contact form message to configured receiver email)
 
 ## Run locally
 ```bash
@@ -59,6 +60,9 @@ Backend: `http://localhost:5000`
 - `PORT=5000`
 - `MONGO_URI=<mongodb connection string>`
 - `FIREBASE_SERVICE_ACCOUNT_JSON=<raw JSON string or base64-encoded JSON string>`
+- `RESEND_API_KEY=<resend api key for contact emails>`
+- `CONTACT_RECEIVER_EMAIL=disamaze@gmail.com`
+- `CONTACT_SENDER_EMAIL=onboarding@resend.dev`
 
 ## Render deployment
 Use `render.yaml` (Blueprint) to create two services:

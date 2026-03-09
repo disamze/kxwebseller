@@ -7,6 +7,7 @@ import { errorHandler, notFound } from './middleware/errorHandler.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 import { uploadsDir } from './config/uploads.js';
 
 dotenv.config();
@@ -55,10 +56,12 @@ app.use('/products', productRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Backward-compatible aliases (helpful when NEXT_PUBLIC_API_URL is missing `/api`)
 app.use('/orders', orderRoutes);
 app.use('/users', userRoutes);
+app.use('/contact', contactRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
