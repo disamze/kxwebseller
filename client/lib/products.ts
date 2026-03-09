@@ -8,13 +8,15 @@ export type ProductType = {
   description: string;
   price: number;
   type: 'course' | 'ebook' | 'test';
+  classLevel?: string;
+  subject?: string;
   thumbnail: string;
   telegramLink?: string;
 };
 
-export async function getProducts(): Promise<ProductType[]> {
+export async function getProducts(query = ''): Promise<ProductType[]> {
   try {
-    const res = await fetch(`${API_URL}/products`, { cache: 'no-store' });
+    const res = await fetch(`${API_URL}/products${query ? `?${query}` : ''}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch products');
     const data = await res.json();
     return data;
