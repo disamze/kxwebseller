@@ -6,7 +6,10 @@ const userSchema = new mongoose.Schema(
     email: { type: String, unique: true, required: true },
     password: String,
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
-    purchasedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
+    purchasedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    referralCode: { type: String, unique: true, sparse: true },
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    referralBalance: { type: Number, default: 0 }
   },
   { timestamps: true }
 );

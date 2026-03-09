@@ -4,6 +4,7 @@ import {
   getAdminUsers,
   getAnalytics,
   getMe,
+  getPublicSettings,
   getUnlockedMaterials,
   syncUser,
   updateAdminSettings,
@@ -14,6 +15,7 @@ import { adminOnly, protect } from '../middleware/auth.js';
 const router = Router();
 
 router.post('/sync', syncUser);
+router.get('/public-settings', getPublicSettings);
 router.get('/me', protect, getMe);
 router.patch('/me', protect, updateMe);
 router.get('/materials', protect, getUnlockedMaterials);
