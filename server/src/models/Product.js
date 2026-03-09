@@ -6,6 +6,8 @@ const productSchema = new mongoose.Schema(
     description: String,
     price: { type: Number, required: true },
     type: { type: String, enum: ['course', 'ebook', 'test'], required: true },
+    classLevel: { type: String, default: '' },
+    subject: { type: String, default: '' },
     thumbnail: String,
     telegramLink: { type: String, required: true },
     previewVideoUrl: { type: String, default: '' },
