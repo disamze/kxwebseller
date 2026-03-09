@@ -5,6 +5,29 @@ import { PlatformSetting } from '../models/PlatformSetting.js';
 
 const validStatuses = new Set(['Pending', 'Approved', 'Rejected']);
 
+function makePersonalCouponCode(email = '') {
+  const local = (email.split('@')[0] || 'KX').replace(/[^a-zA-Z0-9]/g, '').slice(0, 6).toUpperCase() || 'KX';
+  const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `SELF${local}${suffix}`;
+}
+
+async function ensurePersonalCoupon(user) {
+  if (user.personalCouponCode) return user.personalCouponCode;
+  let attempts = 0;
+  while (attempts < 6) {
+    attempts += 1;
+    const code = makePersonalCouponCode(user.email);
+    const exists = await User.findOne({ personalCouponCode: code }).lean();
+    if (!exists) {
+      user.personalCouponCode = code;
+      user.personalCouponUsed = false;
+      await user.save();
+      return code;
+    }
+  }
+  return null;
+}
+
 async function getSettings() {
   return PlatformSetting.findOneAndUpdate(
     { key: 'global' },
@@ -15,6 +38,7 @@ async function getSettings() {
         maintenanceMode: false,
         offerEnabled: false,
         offerText: '',
+        offerEndsAt: null,
         coupons: [],
         referralEnabled: true,
         referralDiscountAmount: 200,
@@ -46,7 +70,16 @@ export const createOrder = asyncHandler(async (req, res) => {
   const code = String(couponCode || '').trim().toUpperCase();
   if (code && originalAmount > 0) {
     const coupon = (settings.coupons || []).find((c) => c.active && String(c.code).toUpperCase() === code);
-    if (coupon) couponDiscount = Math.floor((originalAmount * Number(coupon.percent || 0)) / 100);
+
+    if (coupon) {
+      couponDiscount = Math.floor((originalAmount * Number(coupon.percent || 0)) / 100);
+    } else if (
+      user?.personalCouponCode &&
+      code === String(user.personalCouponCode).toUpperCase() &&
+      !user.personalCouponUsed
+    ) {
+      couponDiscount = Math.min(200, originalAmount);
+    }
   }
 
   let referralDiscount = 0;
@@ -96,13 +129,18 @@ export const reviewOrder = asyncHandler(async (req, res) => {
   await order.save();
 
   if (order.status === 'Approved' && prevStatus !== 'Approved') {
+    const buyer = await User.findById(order.userId);
     await User.findByIdAndUpdate(order.userId, { $addToSet: { purchasedProducts: order.productId } });
 
     if (order.referralDiscount > 0) {
       await User.findByIdAndUpdate(order.userId, { $inc: { referralBalance: -Math.abs(order.referralDiscount) } });
     }
 
-    const buyer = await User.findById(order.userId);
+    if (buyer?.personalCouponCode && order.couponCode && order.couponCode.toUpperCase() === buyer.personalCouponCode.toUpperCase()) {
+      buyer.personalCouponUsed = true;
+      await buyer.save();
+    }
+
     if (buyer?.referredBy && !order.referralBonusGranted) {
       const approvedCount = await Order.countDocuments({ userId: buyer._id, status: 'Approved' });
       if (approvedCount <= 1) {
@@ -110,6 +148,7 @@ export const reviewOrder = asyncHandler(async (req, res) => {
         if (settings.referralEnabled) {
           const bonus = Number(settings.referralDiscountAmount || 200);
           await User.findByIdAndUpdate(buyer.referredBy, { $inc: { referralBalance: bonus } });
+          await ensurePersonalCoupon(buyer);
           order.referralBonusGranted = true;
           await order.save();
         }

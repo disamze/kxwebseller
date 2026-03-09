@@ -104,7 +104,7 @@ export const getUnlockedMaterials = asyncHandler(async (req, res) => {
 });
 
 export const getMe = asyncHandler(async (req, res) => {
-  const me = await User.findById(req.user._id).select('name email role createdAt referralCode referralBalance');
+  const me = await User.findById(req.user._id).select('name email role createdAt referralCode referralBalance personalCouponCode personalCouponUsed');
   res.json(me);
 });
 
@@ -115,7 +115,7 @@ export const updateMe = asyncHandler(async (req, res) => {
     throw new Error('Name is required');
   }
 
-  const me = await User.findByIdAndUpdate(req.user._id, { name: name.trim() }, { new: true }).select('name email role createdAt referralCode referralBalance');
+  const me = await User.findByIdAndUpdate(req.user._id, { name: name.trim() }, { new: true }).select('name email role createdAt referralCode referralBalance personalCouponCode personalCouponUsed');
   res.json(me);
 });
 

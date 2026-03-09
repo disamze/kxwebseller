@@ -20,6 +20,8 @@ function CheckoutContent() {
   const [couponCode, setCouponCode] = useState('');
   const [settings, setSettings] = useState<PublicSettings>({});
   const [referralBalance, setReferralBalance] = useState(0);
+  const [personalCouponCode, setPersonalCouponCode] = useState('');
+  const [personalCouponUsed, setPersonalCouponUsed] = useState(false);
   const [status, setStatus] = useState('');
 
   useEffect(() => {
@@ -37,7 +39,11 @@ function CheckoutContent() {
     if (getSessionUser()) {
       fetch(`${API_URL}/users/me`, { headers: getAuthHeaders() })
         .then((r) => (r.ok ? r.json() : null))
-        .then((d) => setReferralBalance(Number(d?.referralBalance || 0)))
+        .then((d) => {
+          setReferralBalance(Number(d?.referralBalance || 0));
+          setPersonalCouponCode(String(d?.personalCouponCode || ''));
+          setPersonalCouponUsed(Boolean(d?.personalCouponUsed));
+        })
         .catch(() => setReferralBalance(0));
     }
   }, [product]);
@@ -45,10 +51,12 @@ function CheckoutContent() {
   const couponDiscount = useMemo(() => {
     const base = Number(amount || 0);
     const code = couponCode.trim().toUpperCase();
+    if (!base) return 0;
     const coupon = (settings.coupons || []).find((c) => c.code.toUpperCase() === code);
-    if (!coupon || !base) return 0;
-    return Math.floor((base * coupon.percent) / 100);
-  }, [amount, couponCode, settings]);
+    if (coupon) return Math.floor((base * coupon.percent) / 100);
+    if (personalCouponCode && !personalCouponUsed && code === personalCouponCode.toUpperCase()) return Math.min(200, base);
+    return 0;
+  }, [amount, couponCode, settings, personalCouponCode, personalCouponUsed]);
 
   const referralDiscount = useMemo(() => {
     const base = Number(amount || 0);
@@ -96,6 +104,8 @@ function CheckoutContent() {
         <div className="mt-5 grid gap-3">
           <input value={couponCode} onChange={(e) => setCouponCode(e.target.value)} placeholder="Coupon code" className="rounded-xl border p-3" />
           {!!couponDiscount ? <p className="text-xs text-green-600">Coupon discount: -₹{couponDiscount}</p> : null}
+
+          {personalCouponCode ? <p className="text-xs text-slate-500">Your personal code: <b>{personalCouponCode}</b> ({personalCouponUsed ? 'used' : 'available'})</p> : <p className="text-xs text-slate-500">Personal ₹200 code will appear here after your referral success.</p>}
           {!!referralDiscount ? <p className="text-xs text-green-600">Referral discount: -₹{referralDiscount}</p> : <p className="text-xs text-slate-500">Referral wallet: ₹{referralBalance}</p>}
           <p className="text-sm font-semibold">Payable now: ₹{payable}</p>
           {(settings.coupons || []).length ? <p className="text-xs text-slate-500">Available coupons: {(settings.coupons || []).map((c) => `${c.code} (${c.percent}% off)`).join(', ')}</p> : null}

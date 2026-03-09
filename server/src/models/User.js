@@ -9,7 +9,9 @@ const userSchema = new mongoose.Schema(
     purchasedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     referralCode: { type: String, unique: true, sparse: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-    referralBalance: { type: Number, default: 0 }
+    referralBalance: { type: Number, default: 0 },
+    personalCouponCode: { type: String, unique: true, sparse: true },
+    personalCouponUsed: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
