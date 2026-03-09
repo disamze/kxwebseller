@@ -3,15 +3,17 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
-import { setSessionUser } from '@/lib/api';
+import { API_URL, setSessionUser } from '@/lib/api';
 
 export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [status, setStatus] = useState('');
   const router = useRouter();
+  const refFromUrl = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('ref') || '' : '';
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email.trim()) {
       setStatus('Please enter your email.');
@@ -19,6 +21,21 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
     }
 
     const resolvedName = name.trim() || email.split('@')[0] || 'KX User';
+
+    try {
+      await fetch(`${API_URL}/users/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          name: resolvedName,
+          referredByCode: mode === 'signup' ? (referralCode.trim() || refFromUrl) : ''
+        })
+      });
+    } catch {
+      // Non-blocking for local fallback.
+    }
+
     setSessionUser({ email: email.trim(), name: resolvedName, role: 'user' });
     setStatus(mode === 'signup' ? 'Account created. Redirecting to dashboard...' : 'Login successful. Redirecting to dashboard...');
     setTimeout(() => router.push('/dashboard'), 400);
@@ -33,6 +50,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         <form onSubmit={onSubmit} className="mt-6 space-y-3">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="w-full rounded-xl border p-3" />
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" type="email" className="w-full rounded-xl border p-3" />
+          {mode === 'signup' ? (
+            <input value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder="Referral code (optional)" className="w-full rounded-xl border p-3" />
+          ) : null}
           <button className="w-full rounded-xl bg-primary py-3 text-white" type="submit">
             {mode === 'signup' ? 'Sign up' : 'Login'}
           </button>

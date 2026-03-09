@@ -1,6 +1,7 @@
 import { ProductCard } from '@/components/product-card';
 import { getProducts } from '@/lib/products';
 import { ContactUsSection } from '@/components/contact-us-section';
+import { OfferBanner } from '@/components/offer-banner';
 
 const faqs = [
   { q: 'How do I access my course after payment?', a: 'After admin approval, your dashboard unlocks Telegram access links instantly.' },
@@ -33,32 +34,12 @@ const testimonials = [
   }
 ];
 
-const testimonials = [
-  {
-    name: 'Riya Sharma',
-    score: '96% Boards',
-    text: 'I switched to KXMATERIALS 3 months before exams. The revision maps and practice tests gave me confidence and clarity.',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80'
-  },
-  {
-    name: 'Aman Verma',
-    score: 'AIR 422',
-    text: 'Mentor support and fast doubt solutions were game-changing. Every lecture felt practical and focused on scoring marks.',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80'
-  },
-  {
-    name: 'Sneha Patel',
-    score: '95 in Physics',
-    text: 'My favorite part was the PYQ strategy framework. I was able to target important topics and improve quickly.',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=300&q=80'
-  }
-];
-
 export default async function HomePage() {
   const products = await getProducts();
 
   return (
-    <main className="overflow-hidden">
+    <main className="overflow-hidden pb-20 md:pb-0">
+      <OfferBanner />
       <section className="relative min-h-[82vh] px-6 pb-24 pt-28">
         <div className="absolute inset-0 -z-20 bg-slate-950" />
         <div className="hero-orb hero-orb-cyan" />
