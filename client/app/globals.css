@@ -69,3 +69,21 @@ body {
   0%, 100% { transform: scale(1); opacity: 0.65; }
   50% { transform: scale(1.06); opacity: 1; }
 }
+
+.animate-fade-up {
+  animation: fadeUp 0.9s ease-out both;
+}
+
+.animate-float {
+  animation: floatY 5s ease-in-out infinite;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
