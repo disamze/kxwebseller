@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { clearSessionUser, getSessionUser } from '@/lib/api';
-import { LoginModal } from './login-modal';
 
 const links = [
   { label: 'Explore', href: '/explore' },
@@ -15,8 +14,6 @@ const links = [
 ];
 
 export function Navbar() {
-  const [openLogin, setOpenLogin] = useState(false);
-  const [openSignup, setOpenSignup] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
@@ -42,7 +39,7 @@ export function Navbar() {
       window.removeEventListener('session-changed', sync);
       window.removeEventListener('storage', sync);
     };
-  }, [openLogin, openSignup]);
+  }, []);
 
   function toggleTheme() {
     const next = !dark;
@@ -84,8 +81,8 @@ export function Navbar() {
             </>
           ) : (
             <>
-              <button onClick={() => setOpenLogin(true)} className="rounded-xl border px-3 py-2 text-sm">Login</button>
-              <button onClick={() => setOpenSignup(true)} className="rounded-xl bg-primary px-3 py-2 text-sm text-white">Signup</button>
+              <Link href="/login" className="rounded-xl border px-3 py-2 text-sm">Login</Link>
+              <Link href="/signup" className="rounded-xl bg-primary px-3 py-2 text-sm text-white">Signup</Link>
             </>
           )}
         </div>
@@ -115,15 +112,13 @@ export function Navbar() {
             </div>
           ) : (
             <div className="space-y-2 border-t pt-2">
-              <button onClick={() => { setOpenLogin(true); setMobileOpen(false); }} className="w-full rounded-lg border px-3 py-2 text-sm">Login</button>
-              <button onClick={() => { setOpenSignup(true); setMobileOpen(false); }} className="w-full rounded-lg bg-primary px-3 py-2 text-sm text-white">Signup</button>
+              <Link href="/login" onClick={() => setMobileOpen(false)} className="block w-full rounded-lg border px-3 py-2 text-center text-sm">Login</Link>
+              <Link href="/signup" onClick={() => setMobileOpen(false)} className="block w-full rounded-lg bg-primary px-3 py-2 text-center text-sm text-white">Signup</Link>
             </div>
           )}
         </div>
       ) : null}
 
-      <LoginModal open={openLogin} onOpenChange={setOpenLogin} mode="login" />
-      <LoginModal open={openSignup} onOpenChange={setOpenSignup} mode="signup" />
     </header>
   );
 }
