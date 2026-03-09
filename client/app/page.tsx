@@ -1,7 +1,6 @@
 import { ProductCard } from '@/components/product-card';
 import { getProducts } from '@/lib/products';
-import { UserHandlingSection } from '@/components/user-handling-section';
-import { CustomerPurchasesSection } from '@/components/customer-purchases-section';
+import { ContactUsSection } from '@/components/contact-us-section';
 
 const faqs = [
   { q: 'How do I access my course after payment?', a: 'After admin approval, your dashboard unlocks Telegram access links instantly.' },
@@ -37,11 +36,20 @@ export default async function HomePage() {
     <main className="overflow-hidden">
       <section className="relative min-h-[82vh] px-6 pb-24 pt-28">
         <div className="absolute inset-0 -z-20 bg-slate-950" />
+        <div className="hero-orb hero-orb-cyan" />
+        <div className="hero-orb hero-orb-indigo" />
+        <div className="hero-orb hero-orb-pink" />
         <div className="absolute inset-0 -z-10 opacity-75" style={{
           backgroundImage: 'linear-gradient(120deg, rgba(56,189,248,0.2), rgba(129,140,248,0.2), rgba(244,114,182,0.2)), url(https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1800&q=80)',
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }} />
+        <div className="animate-drift absolute left-4 top-24 rounded-2xl border border-white/40 bg-white/10 px-4 py-3 text-xs font-medium text-white shadow-lg backdrop-blur-lg sm:left-10">
+          ⚡ Personal mentor guidance
+        </div>
+        <div className="animate-drift-reverse absolute right-4 top-40 rounded-2xl border border-white/40 bg-white/10 px-4 py-3 text-xs font-medium text-white shadow-lg backdrop-blur-lg sm:right-10">
+          ✅ Verified payment support
+        </div>
         <div className="mx-auto grid w-full max-w-7xl items-center gap-14 lg:grid-cols-2">
           <div className="animate-fade-up text-center text-white lg:text-left">
             <p className="inline-block rounded-full border border-white/40 bg-white/10 px-4 py-1 text-xs font-semibold tracking-[0.18em]">TRUSTED BY 12,000+ LEARNERS</p>
@@ -81,6 +89,25 @@ export default async function HomePage() {
         <div className="rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900"><p className="text-2xl font-bold">4.8★</p><p className="text-xs text-slate-500">Average Rating</p></div>
       </section>
 
+      <section className="marquee-wrap border-y bg-white/60 py-3 text-sm font-semibold text-slate-700 dark:bg-slate-900/40 dark:text-slate-200">
+        <div className="marquee-track">
+          {[
+            'Premium study plans',
+            'Daily live support',
+            'High-scoring strategy sheets',
+            'Structured revision roadmaps',
+            'Trusted by toppers',
+            'Premium study plans',
+            'Daily live support',
+            'High-scoring strategy sheets',
+            'Structured revision roadmaps',
+            'Trusted by toppers'
+          ].map((item, i) => (
+            <span key={`${item}-${i}`} className="mx-6 inline-flex items-center gap-2">✨ {item}</span>
+          ))}
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 pb-4">
         <h2 className="font-heading text-3xl">Top Courses</h2>
       </section>
@@ -104,9 +131,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      <UserHandlingSection />
-      <CustomerPurchasesSection />
 
       <section className="mx-auto max-w-6xl px-6 pb-16">
         <h3 className="font-heading text-3xl">Trusted Student Testimonials</h3>
@@ -145,25 +169,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="contact" className="mx-auto max-w-6xl px-6 pb-16">
-        <div className="grid gap-8 rounded-3xl border bg-white p-8 shadow-sm dark:bg-slate-900 md:grid-cols-2">
-          <div>
-            <h3 className="font-heading text-3xl">Contact Us</h3>
-            <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">Need help selecting the right batch? Our counselors and mentors are ready to help you choose a smart plan based on your target exam and timeline.</p>
-            <div className="mt-5 space-y-2 text-sm">
-              <p><strong>Email:</strong> support@kxmaterials.com</p>
-              <p><strong>WhatsApp:</strong> +91 90000 00000</p>
-              <p><strong>Hours:</strong> 9:00 AM - 10:00 PM (IST)</p>
-            </div>
-          </div>
-          <form className="space-y-3">
-            <input className="w-full rounded-xl border px-4 py-3" placeholder="Your name" />
-            <input className="w-full rounded-xl border px-4 py-3" placeholder="Your email" type="email" />
-            <textarea className="min-h-[120px] w-full rounded-xl border px-4 py-3" placeholder="How can we help?" />
-            <button type="button" className="w-full rounded-xl bg-primary px-5 py-3 font-semibold text-white transition hover:opacity-90">Send Message</button>
-          </form>
-        </div>
-      </section>
+      <ContactUsSection />
 
       <section className="mx-auto max-w-6xl px-6 pb-16">
         <h3 className="font-heading text-2xl">Frequently Asked Questions</h3>
