@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AdminAnalytics } from '@/components/admin-analytics';
 import { API_URL, getAuthHeaders, getSessionUser, setSessionUser, withApiBase } from '@/lib/api';
 
-type AdminTab = 'overview' | 'add' | 'courses' | 'orders' | 'users' | 'analytics' | 'profile' | 'settings';
+type AdminTab = 'overview' | 'add' | 'courses' | 'orders' | 'users' | 'analytics' | 'profile' | 'settings' | 'promotions';
 
 const items: { key: AdminTab; label: string }[] = [
   { key: 'overview', label: 'Overview' },
@@ -16,7 +16,8 @@ const items: { key: AdminTab; label: string }[] = [
   { key: 'users', label: 'Users' },
   { key: 'analytics', label: 'Analytics' },
   { key: 'profile', label: 'Admin Profile' },
-  { key: 'settings', label: 'Settings' }
+  { key: 'settings', label: 'Settings' },
+  { key: 'promotions', label: 'Offers / Coupons / Referral' }
 ];
 
 type Order = {
@@ -41,6 +42,7 @@ type AdminSettings = {
   maintenanceMode: boolean;
   offerEnabled: boolean;
   offerText: string;
+  offerEndsAt?: string | null;
   referralEnabled: boolean;
   referralDiscountAmount: number;
   referralMinPurchase: number;
@@ -79,6 +81,7 @@ const defaultSettings: AdminSettings = {
   maintenanceMode: false,
   offerEnabled: false,
   offerText: '',
+  offerEndsAt: null,
   referralEnabled: true,
   referralDiscountAmount: 200,
   referralMinPurchase: 900,
@@ -396,6 +399,33 @@ export default function AdminPage() {
                   <p><b>Joined:</b> {user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A'}</p>
                 </article>
               ))}
+            </div>
+          </div>
+        ) : null}
+
+
+        {activeTab === 'promotions' ? (
+          <div className="rounded-2xl border p-5">
+            <h3 className="font-heading text-xl">Offers / Coupons / Referral Controls</h3>
+            <div className="mt-4 space-y-3">
+              <label className="flex items-center justify-between rounded-xl border p-3 text-sm"><span>Enable offer banner</span><input type="checkbox" checked={settings.offerEnabled} onChange={(e) => setSettings((s) => ({ ...s, offerEnabled: e.target.checked }))} /></label>
+              <input value={settings.offerText} onChange={(e) => setSettings((s) => ({ ...s, offerText: e.target.value }))} placeholder="Offer text (example: FESTIVE SALE 25% OFF)" className="w-full rounded-xl border p-3 text-sm" />
+              <input type="datetime-local" value={settings.offerEndsAt ? new Date(settings.offerEndsAt).toISOString().slice(0,16) : ''} onChange={(e) => setSettings((s) => ({ ...s, offerEndsAt: e.target.value ? new Date(e.target.value).toISOString() : null }))} className="w-full rounded-xl border p-3 text-sm" />
+
+              <label className="flex items-center justify-between rounded-xl border p-3 text-sm"><span>Enable referral discount system</span><input type="checkbox" checked={settings.referralEnabled} onChange={(e) => setSettings((s) => ({ ...s, referralEnabled: e.target.checked }))} /></label>
+              <div className="grid grid-cols-2 gap-2">
+                <input value={settings.referralDiscountAmount} onChange={(e) => setSettings((s) => ({ ...s, referralDiscountAmount: Number(e.target.value || 0) }))} className="rounded-xl border p-3 text-sm" placeholder="Referral reward/discount amount" />
+                <input value={settings.referralMinPurchase} onChange={(e) => setSettings((s) => ({ ...s, referralMinPurchase: Number(e.target.value || 0) }))} className="rounded-xl border p-3 text-sm" placeholder="Minimum purchase amount" />
+              </div>
+
+              <input value={couponDraft} onChange={(e) => setCouponDraft(e.target.value)} placeholder="Add coupon list: WELCOME10:10, TEST20:20" className="w-full rounded-xl border p-3 text-sm" />
+              <div className="rounded-xl border p-3 text-sm">
+                <p className="font-semibold">Active coupons from admin settings:</p>
+                <div className="mt-2 flex flex-wrap gap-2">{(settings.coupons || []).map((c) => <span key={c.code} className="rounded-full bg-indigo-100 px-2 py-1 text-indigo-900">{c.code} ({c.percent}%)</span>)}</div>
+              </div>
+
+              <button onClick={saveSettings} className="rounded-xl bg-primary px-5 py-3 text-white">Save Promotions Settings</button>
+              {settingsStatus ? <p className="text-sm text-slate-500">{settingsStatus}</p> : null}
             </div>
           </div>
         ) : null}

@@ -16,6 +16,7 @@ const platformSettingSchema = new mongoose.Schema(
     maintenanceMode: { type: Boolean, default: false },
     offerEnabled: { type: Boolean, default: false },
     offerText: { type: String, default: '' },
+    offerEndsAt: { type: Date, default: null },
     coupons: { type: [couponSchema], default: [] },
     referralEnabled: { type: Boolean, default: true },
     referralDiscountAmount: { type: Number, default: 200 },

@@ -45,6 +45,7 @@ async function getOrCreateGlobalSettings() {
         maintenanceMode: false,
         offerEnabled: false,
         offerText: '',
+        offerEndsAt: null,
         coupons: [],
         referralEnabled: true,
         referralDiscountAmount: 200,
@@ -194,6 +195,7 @@ export const getPublicSettings = asyncHandler(async (_req, res) => {
   res.json({
     offerEnabled: settings.offerEnabled,
     offerText: settings.offerText,
+    offerEndsAt: settings.offerEndsAt,
     coupons: (settings.coupons || []).filter((c) => c.active).map((c) => ({ code: c.code, percent: c.percent })),
     referralEnabled: settings.referralEnabled,
     referralDiscountAmount: settings.referralDiscountAmount,
@@ -207,6 +209,7 @@ export const updateAdminSettings = asyncHandler(async (req, res) => {
     maintenanceMode: Boolean(req.body.maintenanceMode),
     offerEnabled: Boolean(req.body.offerEnabled),
     offerText: String(req.body.offerText || '').trim(),
+    offerEndsAt: req.body.offerEndsAt ? new Date(req.body.offerEndsAt) : null,
     referralEnabled: Boolean(req.body.referralEnabled),
     referralDiscountAmount: Math.max(0, Number(req.body.referralDiscountAmount || 0)),
     referralMinPurchase: Math.max(0, Number(req.body.referralMinPurchase || 0)),

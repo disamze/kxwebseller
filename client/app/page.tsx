@@ -2,6 +2,7 @@ import { ProductCard } from '@/components/product-card';
 import { getProducts } from '@/lib/products';
 import { ContactUsSection } from '@/components/contact-us-section';
 import { OfferBanner } from '@/components/offer-banner';
+import { OffersShowcase } from '@/components/offers-showcase';
 
 const faqs = [
   { q: 'How do I access my course after payment?', a: 'After admin approval, your dashboard unlocks Telegram access links instantly.' },
@@ -87,6 +88,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <OffersShowcase />
 
       <section className="mx-auto -mt-10 grid max-w-6xl grid-cols-2 gap-4 px-6 pb-14 text-center md:grid-cols-4">
         <div className="rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900"><p className="text-2xl font-bold">12,000+</p><p className="text-xs text-slate-500">Students</p></div>
