@@ -97,6 +97,27 @@ export default async function HomePage() {
         <div className="rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-900"><p className="text-2xl font-bold">4.8★</p><p className="text-xs text-slate-500">Average Rating</p></div>
       </section>
 
+
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <div className="grid gap-4 md:grid-cols-3">
+          <a href="/explore?priceType=free" className="rounded-2xl border bg-gradient-to-br from-cyan-100 to-sky-200 p-5 shadow-sm transition hover:-translate-y-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-cyan-800">FREE RESOURCES</p>
+            <h4 className="mt-2 font-heading text-xl">Start with Zero-Cost Materials</h4>
+            <p className="mt-2 text-sm text-slate-700">Get free notes, starters and demo kits to begin instantly.</p>
+          </a>
+          <a href="/explore?type=course" className="rounded-2xl border bg-gradient-to-br from-indigo-100 to-violet-200 p-5 shadow-sm transition hover:-translate-y-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-800">MOST POPULAR</p>
+            <h4 className="mt-2 font-heading text-xl">Top-Rated Exam Batches</h4>
+            <p className="mt-2 text-sm text-slate-700">Structured classes, PYQ strategy and full revision support.</p>
+          </a>
+          <a href="/checkout" className="rounded-2xl border bg-gradient-to-br from-amber-100 to-orange-200 p-5 shadow-sm transition hover:-translate-y-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-amber-800">LIMITED PERIOD</p>
+            <h4 className="mt-2 font-heading text-xl">Apply Coupons Before Checkout</h4>
+            <p className="mt-2 text-sm text-slate-700">Use active coupon and referral discounts for maximum savings.</p>
+          </a>
+        </div>
+      </section>
+
       <section className="marquee-wrap border-y bg-white/60 py-3 text-sm font-semibold text-slate-700 dark:bg-slate-900/40 dark:text-slate-200">
         <div className="marquee-track">
           {[
