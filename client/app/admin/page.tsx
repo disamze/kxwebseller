@@ -114,6 +114,7 @@ export default function AdminPage() {
   const [status, setStatus] = useState('');
   const [settings, setSettings] = useState<AdminSettings>(defaultSettings);
   const [couponDraft, setCouponDraft] = useState('');
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [settingsStatus, setSettingsStatus] = useState('');
   const router = useRouter();
 
@@ -178,10 +179,15 @@ export default function AdminPage() {
 
     const url = editingProductId ? `${API_URL}/products/${editingProductId}` : `${API_URL}/products`;
     const method = editingProductId ? 'PATCH' : 'POST';
+    const payload = buildProductPayload();
+    const formData = new FormData();
+    Object.entries(payload).forEach(([k, v]) => formData.append(k, String(v ?? '')));
+    if (thumbnailFile) formData.set('thumbnail', thumbnailFile);
+
     const res = await fetch(url, {
       method,
-      headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify(buildProductPayload())
+      headers: getAuthHeaders(),
+      body: formData
     });
     const data = await res.json();
     if (!res.ok) return setStatus(data.message || 'Failed to save product');
@@ -189,6 +195,7 @@ export default function AdminPage() {
     setStatus(editingProductId ? 'Product updated successfully.' : 'Product created successfully.');
     setForm(defaultForm);
     setEditingProductId(null);
+    setThumbnailFile(null);
     await loadProducts();
     setActiveTab('courses');
   }
@@ -217,6 +224,7 @@ export default function AdminPage() {
       studentsCount: String(product.studentsCount || 0),
       rating: String(product.rating || 4.8)
     });
+    setThumbnailFile(null);
     setActiveTab('add');
   }
 
@@ -289,7 +297,7 @@ export default function AdminPage() {
       <main className="mx-auto max-w-2xl px-6 py-16">
         <h1 className="font-heading text-3xl">Admin Access Required</h1>
         <p className="mt-3 text-slate-500">Please login from the dedicated admin login page.</p>
-        <Link href="/admin-login" className="mt-5 inline-block rounded-xl bg-primary px-5 py-3 text-white">Go to Admin Login</Link>
+  <Link href="/admin-login" className="mt-5 inline-block rounded-xl bg-primary px-5 py-3 text-white">Go to Admin Login</Link>
       </main>
     );
   }
@@ -330,11 +338,15 @@ export default function AdminPage() {
               <select value={form.type} onChange={(e) => setForm((s) => ({ ...s, type: e.target.value }))} className="rounded-xl border p-3">
                 <option value="course">Course</option><option value="ebook">Ebook</option><option value="test">Test</option>
               </select>
-              <input value={form.thumbnail} onChange={(e) => setForm((s) => ({ ...s, thumbnail: e.target.value }))} className="rounded-xl border p-3" placeholder="Thumbnail URL" />
+              <div className="rounded-xl border p-3">
+                <p className="mb-2 text-xs text-slate-500">Upload thumbnail image</p>
+                <input type="file" accept="image/*" onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)} className="w-full text-sm" />
+                {form.thumbnail ? <img src={withApiBase(form.thumbnail)} alt="Current thumbnail" className="mt-2 h-14 w-24 rounded object-cover" /> : null}
+              </div>
               <input value={form.telegramLink} onChange={(e) => setForm((s) => ({ ...s, telegramLink: e.target.value }))} className="rounded-xl border p-3 md:col-span-2" placeholder="Telegram Link" />
               <textarea value={form.description} onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))} className="min-h-[120px] rounded-xl border p-3 md:col-span-2" placeholder="Description" />
               <button onClick={saveProduct} className="rounded-xl bg-primary px-5 py-3 text-white md:col-span-2">{editingProductId ? 'Update Product' : 'Create Product'}</button>
-              {editingProductId ? <button onClick={() => { setEditingProductId(null); setForm(defaultForm); }} className="rounded-xl border px-5 py-3 md:col-span-2">Cancel edit</button> : null}
+              {editingProductId ? <button onClick={() => { setEditingProductId(null); setForm(defaultForm); setThumbnailFile(null); }} className="rounded-xl border px-5 py-3 md:col-span-2">Cancel edit</button> : null}
               {status ? <p className="text-sm text-slate-500 md:col-span-2">{status}</p> : null}
             </div>
           </div>

@@ -68,7 +68,10 @@ export const getProducts = asyncHandler(async (req, res) => {
 
 export const createProduct = asyncHandler(async (req, res) => {
   try {
-    const payload = normalizeProductPayload(req.body);
+    const payload = normalizeProductPayload({
+      ...req.body,
+      thumbnail: req.file ? `/uploads/${req.file.filename}` : req.body.thumbnail
+    });
     const product = await Product.create(payload);
     res.status(201).json(product);
   } catch (error) {
@@ -85,7 +88,11 @@ export const updateProduct = asyncHandler(async (req, res) => {
   }
 
   try {
-    const payload = normalizeProductPayload({ ...product.toObject(), ...req.body });
+    const payload = normalizeProductPayload({
+      ...product.toObject(),
+      ...req.body,
+      thumbnail: req.file ? `/uploads/${req.file.filename}` : (req.body.thumbnail || product.thumbnail)
+    });
     Object.assign(product, payload);
     await product.save();
     res.json(product);
