@@ -69,3 +69,89 @@ body {
   0%, 100% { transform: scale(1); opacity: 0.65; }
   50% { transform: scale(1.06); opacity: 1; }
 }
+
+.animate-fade-up {
+  animation: fadeUp 0.9s ease-out both;
+}
+
+.animate-float {
+  animation: floatY 5s ease-in-out infinite;
+}
+
+.animate-drift {
+  animation: drift 6s ease-in-out infinite;
+}
+
+.animate-drift-reverse {
+  animation: driftReverse 7s ease-in-out infinite;
+}
+
+.hero-orb {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 9999px;
+  filter: blur(24px);
+  opacity: 0.35;
+  z-index: -15;
+  animation: orbPulse 6s ease-in-out infinite;
+}
+
+.hero-orb-cyan {
+  left: -70px;
+  top: 120px;
+  background: #22d3ee;
+}
+
+.hero-orb-indigo {
+  right: 10%;
+  top: 70px;
+  background: #6366f1;
+  animation-delay: 1.2s;
+}
+
+.hero-orb-pink {
+  right: -70px;
+  bottom: 30px;
+  background: #f472b6;
+  animation-delay: 2.2s;
+}
+
+.marquee-wrap {
+  overflow: hidden;
+}
+
+.marquee-track {
+  white-space: nowrap;
+  animation: marquee 22s linear infinite;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-10px) translateX(8px); }
+}
+
+@keyframes driftReverse {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(8px) translateX(-10px); }
+}
+
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); opacity: 0.25; }
+  50% { transform: scale(1.15); opacity: 0.45; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}

@@ -5,13 +5,17 @@ import { API_URL } from '@/lib/api';
 
 export function SiteKeepAlive() {
   useEffect(() => {
-    const healthUrl = `${API_URL}/health`;
+    const apiHealthUrl = `${API_URL}/health`;
+    const clientHealthUrl = '/';
 
-    fetch(healthUrl).catch(() => null);
+    const ping = () => {
+      fetch(apiHealthUrl, { cache: 'no-store' }).catch(() => null);
+      fetch(clientHealthUrl, { cache: 'no-store' }).catch(() => null);
+    };
 
-    const timer = setInterval(() => {
-      fetch(healthUrl).catch(() => null);
-    }, 300000);
+    ping();
+
+    const timer = setInterval(ping, 60_000);
 
     return () => clearInterval(timer);
   }, []);
