@@ -26,6 +26,13 @@ type CheckoutProduct = {
   thumbnail?: string;
 };
 
+type PublicSettings = {
+  coupons?: { code: string; percent: number }[];
+  referralEnabled?: boolean;
+  referralDiscountAmount?: number;
+  referralMinPurchase?: number;
+};
+
 function CheckoutContent() {
   const params = useSearchParams();
   const productId = params.get('product') || '';
@@ -98,6 +105,25 @@ function CheckoutContent() {
   }, [amount, couponDiscount, referralWalletDiscount, referralCode, settings]);
 
   const payable = Math.max(0, amount - couponDiscount - referralWalletDiscount - referralCodeDiscount);
+
+  const couponDiscount = useMemo(() => {
+    const base = Number(amount || 0);
+    const code = couponCode.trim().toUpperCase();
+    if (!base) return 0;
+    const coupon = (settings.coupons || []).find((c) => c.code.toUpperCase() === code);
+    if (coupon) return Math.floor((base * coupon.percent) / 100);
+    if (personalCouponCode && !personalCouponUsed && code === personalCouponCode.toUpperCase()) return Math.min(200, base);
+    return 0;
+  }, [amount, couponCode, settings, personalCouponCode, personalCouponUsed]);
+
+  const referralDiscount = useMemo(() => {
+    const base = Number(amount || 0);
+    if (!settings.referralEnabled) return 0;
+    if (base < Number(settings.referralMinPurchase || 900)) return 0;
+    return Math.min(referralBalance, Number(settings.referralDiscountAmount || 200));
+  }, [amount, settings, referralBalance]);
+
+  const payable = Math.max(0, Number(amount || 0) - couponDiscount - referralDiscount);
 
   async function submitPayment(e: FormEvent) {
     e.preventDefault();
