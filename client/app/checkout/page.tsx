@@ -192,7 +192,7 @@ function CheckoutContent() {
 
         <form onSubmit={submitPayment} className="rounded-2xl border bg-white p-6 shadow-sm dark:bg-slate-900">
           <h2 className="text-lg font-semibold">Payment Details</h2>
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=upi://pay?pa=kxmaterials@upi" alt="UPI QR" className="mx-auto mt-4" />
+          <img src="/Screenshot 2026-03-10 155819.png" alt="UPI QR" className="mx-auto mt-4" />
           <p className="mt-4 text-center text-sm">UPI ID: <b>kxmaterials@upi</b></p>
 
           <div className="mt-5 space-y-3">
