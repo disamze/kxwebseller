@@ -7,6 +7,8 @@ function normalizeProductPayload(body = {}) {
     description: String(body.description || '').trim(),
     price: Number(body.price),
     type: String(body.type || '').trim(),
+    classLevel: String(body.classLevel || '').trim(),
+    subject: String(body.subject || '').trim(),
     thumbnail: String(body.thumbnail || '').trim(),
     telegramLink: String(body.telegramLink || '').trim(),
     previewVideoUrl: String(body.previewVideoUrl || '').trim(),
@@ -14,8 +16,8 @@ function normalizeProductPayload(body = {}) {
     rating: Number(body.rating || 4.8)
   };
 
-  if (!Number.isFinite(payload.price) || payload.price <= 0) {
-    throw new Error('Price must be a valid positive number');
+  if (!Number.isFinite(payload.price) || payload.price < 0) {
+    throw new Error('Price must be a valid non-negative number');
   }
 
   if (!payload.title || !payload.description || !payload.telegramLink) {
@@ -38,15 +40,38 @@ function normalizeProductPayload(body = {}) {
 }
 
 export const getProducts = asyncHandler(async (req, res) => {
-  const { type } = req.query;
-  const filter = type ? { type } : {};
+  const { type, q, classLevel, subject, priceMin, priceMax, priceType } = req.query;
+  const filter = {};
+  if (type) filter.type = type;
+  if (classLevel) filter.classLevel = { $regex: `^${String(classLevel).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' };
+  if (subject) filter.subject = { $regex: `^${String(subject).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' };
+
+  if (priceType === 'free') filter.price = 0;
+  if (priceType === 'paid') filter.price = { ...(filter.price || {}), $gt: 0 };
+
+  if (priceMin || priceMax) {
+    filter.price = {
+      ...(typeof filter.price === 'object' ? filter.price : {}),
+      ...(priceMin ? { $gte: Number(priceMin) } : {}),
+      ...(priceMax ? { $lte: Number(priceMax) } : {})
+    };
+  }
+
+  if (q) {
+    const regex = new RegExp(String(q).trim(), 'i');
+    filter.$or = [{ title: regex }, { description: regex }, { subject: regex }, { classLevel: regex }];
+  }
+
   const products = await Product.find(filter).sort({ createdAt: -1 });
   res.json(products);
 });
 
 export const createProduct = asyncHandler(async (req, res) => {
   try {
-    const payload = normalizeProductPayload(req.body);
+    const payload = normalizeProductPayload({
+      ...req.body,
+      thumbnail: req.file ? `/uploads/${req.file.filename}` : req.body.thumbnail
+    });
     const product = await Product.create(payload);
     res.status(201).json(product);
   } catch (error) {
@@ -65,9 +90,9 @@ export const updateProduct = asyncHandler(async (req, res) => {
   try {
     const payload = normalizeProductPayload({
       ...product.toObject(),
-      ...req.body
+      ...req.body,
+      thumbnail: req.file ? `/uploads/${req.file.filename}` : (req.body.thumbnail || product.thumbnail)
     });
-
     Object.assign(product, payload);
     await product.save();
     res.json(product);
