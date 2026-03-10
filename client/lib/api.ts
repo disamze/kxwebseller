@@ -72,8 +72,14 @@ export function getAuthHeaders(extra: Record<string, string> = {}) {
   return headers;
 }
 
-export function withApiBase(url: string) {
+export function withApiBase(url?: string) {
   if (!url) return '';
-  if (url.startsWith('http')) return url;
-  return `${API_URL.replace('/api', '')}${url}`;
+
+  const normalized = String(url).trim().replace(/\\/g, '/');
+  if (!normalized) return '';
+  if (/^https?:\/\//i.test(normalized)) return normalized;
+
+  const path = normalized.startsWith('/') ? normalized : `/${normalized}`;
+  const base = API_URL.replace(/\/api$/, '');
+  return `${base}${path}`;
 }

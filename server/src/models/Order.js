@@ -11,6 +11,8 @@ const orderSchema = new mongoose.Schema(
     couponCode: { type: String, default: '' },
     couponDiscount: { type: Number, default: 0 },
     referralDiscount: { type: Number, default: 0 },
+    referralCodeUsed: { type: String, default: '' },
+    referralCodeDiscount: { type: Number, default: 0 },
     finalAmount: { type: Number, default: 0 },
     referralBonusGranted: { type: Boolean, default: false }
   },

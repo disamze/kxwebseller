@@ -1,6 +1,14 @@
 import { Product } from '../models/Product.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 
+function normalizeThumbnail(value = '') {
+  const raw = String(value || '').trim().replace(/\\/g, '/');
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return raw.startsWith('/') ? raw : `/${raw}`;
+}
+
+
 function normalizeProductPayload(body = {}) {
   const payload = {
     title: String(body.title || '').trim(),
@@ -9,7 +17,7 @@ function normalizeProductPayload(body = {}) {
     type: String(body.type || '').trim(),
     classLevel: String(body.classLevel || '').trim(),
     subject: String(body.subject || '').trim(),
-    thumbnail: String(body.thumbnail || '').trim(),
+    thumbnail: normalizeThumbnail(body.thumbnail),
     telegramLink: String(body.telegramLink || '').trim(),
     previewVideoUrl: String(body.previewVideoUrl || '').trim(),
     studentsCount: Number(body.studentsCount || 0),
