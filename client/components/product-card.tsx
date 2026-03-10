@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { withApiBase } from '@/lib/api';
 
 type ProductCardProps = {
   id?: string;
@@ -22,7 +23,7 @@ export function ProductCard({ id, _id, title, description, price, thumbnail, cla
 
   return (
     <motion.div whileHover={{ y: -6 }} className="rounded-2xl bg-white p-4 shadow-lg dark:bg-slate-900">
-      <img src={thumbnail} alt={title} className="h-44 w-full rounded-xl object-cover" />
+      <img src={withApiBase(thumbnail)} alt={title} className="h-44 w-full rounded-xl object-cover" />
       <h3 className="mt-3 font-heading text-lg">{title}</h3>
       <p className="mt-2 line-clamp-2 text-sm text-slate-500">{description}</p>
       <div className="mt-2 flex flex-wrap gap-2 text-xs">

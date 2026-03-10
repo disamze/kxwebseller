@@ -297,7 +297,7 @@ export default function AdminPage() {
       <main className="mx-auto max-w-2xl px-6 py-16">
         <h1 className="font-heading text-3xl">Admin Access Required</h1>
         <p className="mt-3 text-slate-500">Please login from the dedicated admin login page.</p>
-  <Link href="/admin-login" className="mt-5 inline-block rounded-xl bg-primary px-5 py-3 text-white">Go to Admin Login</Link>
+        <Link href="/admin-login" className="mt-5 inline-block rounded-xl bg-primary px-5 py-3 text-white">Go to Admin Login</Link>
       </main>
     );
   }
