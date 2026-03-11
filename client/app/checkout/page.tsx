@@ -26,13 +26,6 @@ type CheckoutProduct = {
   thumbnail?: string;
 };
 
-type PublicSettings = {
-  coupons?: { code: string; percent: number }[];
-  referralEnabled?: boolean;
-  referralDiscountAmount?: number;
-  referralMinPurchase?: number;
-};
-
 function CheckoutContent() {
   const params = useSearchParams();
   const productId = params.get('product') || '';
@@ -74,6 +67,7 @@ function CheckoutContent() {
   }, [productId]);
 
   const amount = Number(product?.price || 0);
+  const customUpiQr = process.env.NEXT_PUBLIC_UPI_QR_IMAGE_URL || 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=upi://pay?pa=kxmaterials@upi';
 
   const couponDiscount = useMemo(() => {
     const code = couponCode.trim().toUpperCase();
@@ -105,25 +99,6 @@ function CheckoutContent() {
   }, [amount, couponDiscount, referralWalletDiscount, referralCode, settings]);
 
   const payable = Math.max(0, amount - couponDiscount - referralWalletDiscount - referralCodeDiscount);
-
-  const couponDiscount = useMemo(() => {
-    const base = Number(amount || 0);
-    const code = couponCode.trim().toUpperCase();
-    if (!base) return 0;
-    const coupon = (settings.coupons || []).find((c) => c.code.toUpperCase() === code);
-    if (coupon) return Math.floor((base * coupon.percent) / 100);
-    if (personalCouponCode && !personalCouponUsed && code === personalCouponCode.toUpperCase()) return Math.min(200, base);
-    return 0;
-  }, [amount, couponCode, settings, personalCouponCode, personalCouponUsed]);
-
-  const referralDiscount = useMemo(() => {
-    const base = Number(amount || 0);
-    if (!settings.referralEnabled) return 0;
-    if (base < Number(settings.referralMinPurchase || 900)) return 0;
-    return Math.min(referralBalance, Number(settings.referralDiscountAmount || 200));
-  }, [amount, settings, referralBalance]);
-
-  const payable = Math.max(0, Number(amount || 0) - couponDiscount - referralDiscount);
 
   async function submitPayment(e: FormEvent) {
     e.preventDefault();
@@ -192,7 +167,7 @@ function CheckoutContent() {
 
         <form onSubmit={submitPayment} className="rounded-2xl border bg-white p-6 shadow-sm dark:bg-slate-900">
           <h2 className="text-lg font-semibold">Payment Details</h2>
-          <img src="/Screenshot 2026-03-10 155819.png" alt="UPI QR" className="mx-auto mt-4" />
+          <img src={customUpiQr} alt="UPI QR" className="mx-auto mt-4 w-[260px] rounded-xl border p-2" />
           <p className="mt-4 text-center text-sm">UPI ID: <b>kxmaterials@upi</b></p>
 
           <div className="mt-5 space-y-3">
