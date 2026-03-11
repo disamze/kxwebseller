@@ -7,7 +7,14 @@ const orderSchema = new mongoose.Schema(
     amount: Number,
     transactionId: String,
     paymentScreenshot: { type: String, required: true },
-    status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' }
+    status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
+    couponCode: { type: String, default: '' },
+    couponDiscount: { type: Number, default: 0 },
+    referralDiscount: { type: Number, default: 0 },
+    referralCodeUsed: { type: String, default: '' },
+    referralCodeDiscount: { type: Number, default: 0 },
+    finalAmount: { type: Number, default: 0 },
+    referralBonusGranted: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

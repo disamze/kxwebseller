@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { API_URL, getAuthHeaders, getSessionUser, setSessionUser } from '@/lib/api';
+import { API_URL, getAuthHeaders, getSessionUser, setSessionUser, withApiBase } from '@/lib/api';
 
 type Material = {
   id: string;
@@ -187,7 +187,7 @@ export default function DashboardPage() {
             <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {list.length ? list.map((item) => (
                 <article key={item.id} className="rounded-2xl border p-4 shadow-sm">
-                  <img src={item.thumbnail} alt={item.title} className="h-36 w-full rounded-xl object-cover" />
+                  <img src={withApiBase(item.thumbnail)} alt={item.title} className="h-36 w-full rounded-xl object-cover" />
                   <p className="mt-3 font-semibold">{item.title}</p>
                   <p className="text-xs text-slate-500">{item.type}</p>
                   <a href={item.telegramLink} target="_blank" className="mt-3 inline-block rounded-lg bg-accent px-4 py-2 text-white" rel="noreferrer">
