@@ -167,7 +167,7 @@ function CheckoutContent() {
 
         <form onSubmit={submitPayment} className="rounded-2xl border bg-white p-6 shadow-sm dark:bg-slate-900">
           <h2 className="text-lg font-semibold">Payment Details</h2>
-          <img src={customUpiQr} alt="UPI QR" className="mx-auto mt-4 w-[260px] rounded-xl border p-2" />
+          <img src="client/app/checkout/Screenshot 2026-03-10 155819.png" alt="UPI QR" className="mx-auto mt-4 w-[260px] rounded-xl border p-2" />
           <p className="mt-4 text-center text-sm">UPI ID: <b>kxmaterials@upi</b></p>
 
           <div className="mt-5 space-y-3">
