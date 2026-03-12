@@ -31,7 +31,6 @@ export default function AdminLoginPage() {
         <button className="w-full rounded-xl bg-primary py-3 text-white">Login as Admin</button>
         {status ? <p className="text-xs text-slate-500">{status}</p> : null}
       </form>
-      <p className="mt-3 text-xs text-slate-400">Configured admin: kxsam@admin / collab@kxsam</p>
     </main>
   );
 }
