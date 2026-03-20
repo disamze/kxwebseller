@@ -17,7 +17,7 @@ const faqs = [
 
 const testimonials = [
   {
-    name: 'Riya Sharma',
+    name: 'Aditya Singh',
     score: '96% Boards',
     text: 'I switched to KXMATERIALS 3 months before exams. The revision maps and practice tests gave me confidence and clarity.',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80'
@@ -73,7 +73,7 @@ export default async function HomePage() {
             <div className="glass rounded-3xl border border-slate-200/60 bg-white/85 p-5 text-slate-900 shadow-2xl dark:border-slate-700 dark:bg-slate-900/75 dark:text-white">
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
-                  ['95%+', 'Student satisfaction'],
+                  ['98%+', 'Student satisfaction'],
                   ['4.8★', 'Average rating'],
                   ['500+', 'Video lectures'],
                   ['24/7', 'Telegram support']
